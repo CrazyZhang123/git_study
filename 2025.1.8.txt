@@ -2,3 +2,8 @@
 第二次修改
 
 测试zjj_test_1_8
+
+第二次测试zjj_test_1_8  
+学习记录：
+关联本地分支与远程分支
+git branch --set-upstream-to=origin/zjj_test_1_8  zjj_test_1_8  
