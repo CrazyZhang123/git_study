@@ -43,19 +43,9 @@ updated: 2024-09-30T18:45
 
 [交叉熵及实现讲解](https://zhuanlan.zhihu.com/p/98785902?ivk_sa=1024320u)
 
-[Pytorch常用的交叉熵损失函数CrossEntropyLoss()详解](Pytorch常用的交叉熵损失函数CrossEntropyLoss()详解.md)
-
-softmax的目的是归一化，并且使得相加和为1.
-
 ##### Mini-Batch 公式
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20240930183830.png)
-**详细解释**
-1、y=1,$\hat{y}$=0.2  loss = -(1\*0.2+ 0\*(1-0.2)) = 1.6094
-3、y=0,$\hat{y}$=0.3  loss = -(0\*0.3+ 1\*(1-0.3)) = 0.3567
 
-**注意：**
-**pytorch深度学习框架内的函数会将标签值做one_hot处理,之后再进行交叉熵的公式运算.**  
-**因此在使用pytorch框架的时候,标签无须自己做转换.
 #### Implementation of Logistic Regression
 
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20240930183903.png)
@@ -63,7 +53,7 @@ softmax的目的是归一化，并且使得相加和为1.
 - torch.nn.functional as F ，F里面存着许多函数比如sigmod函数(Logistic函数)
 
 ##### new Loss——BCE Loss
-新损失——BCELoss 二分类损失。
+新损失——BCELoss
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20240930184117.png)
 
 #### Logistic Regression Implementation

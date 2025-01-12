@@ -61,17 +61,20 @@ $$
 
 也就是梯度 Gradient 为0的情况
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20240929172246.png)
- 
+```ad-caution  
 (1)<mark style="background: #FF0000;">不一定能找到全局最优，可以找局部最优。</mark> 但实际情况能找到全局最优，局部最优没有这么普遍。
 (2)鞍点问题
 	在鞍点梯度g = 0,就导致w=w-ag无法更新了
 	注意鞍点 saddle point 在上面正视从左到右是最低点，从前往后是最高点，这个点就是saddle point
 
 
-学习
+```
 
+学习
+```ad-help
 [[区分鞍点和局部最优]](李宏毅老师)
 [[深度学习详解：局部极小值与鞍点]](代码部分讲解)
 
+```
 
 

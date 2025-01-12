@@ -20,7 +20,7 @@ updated: 2024-10-01T22:45
 
 ![image.png|571](https://gitee.com/zhang-junjie123/picture/raw/master/image/20240930213322.png)
 
-
+```ad-note
 矩阵是空间变换的函数。
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20240930213805.png)
 
@@ -28,6 +28,7 @@ A是一个将N维空间转为M维的空间变换的函数。
 
 神经网络是寻找一个非线性变化的函数。
 
+```
 
 ##### Linear Layer
 ![image.png|603](https://gitee.com/zhang-junjie123/picture/raw/master/image/20240930214037.png)

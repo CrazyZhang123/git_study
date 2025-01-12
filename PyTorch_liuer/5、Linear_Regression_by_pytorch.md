@@ -43,7 +43,7 @@ x_data,y_data是列向量
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20240929233554.png)
 
 完整代码
-![[pytorch学习问题总结#^befafd]]
+![[pytorch学习问题总结#^a35883]]
 ```python
 import torch
 

@@ -9,20 +9,17 @@ updated: 2024-10-07T21:52
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007200514.png)
 
 改进模型
-
-可以去掉中间的输出
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007201005.png)
 
 ### Our Model
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007201147.png)
 - 输入序列的长度不一致
-![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250817143447933.png)
 
 #### Implementation - 1、Preparing Data
 - 处理人名Name
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007201741.png)
 - 将字符串转换为ascii序列
-- 解决输入不一致的问题，用padding填充0，==填充后作为我们的输入==
+- 解决输入不一致的问题，用padding填充0
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007201847.png)
 
 - 国家类别——构造字典
@@ -41,15 +38,13 @@ updated: 2024-10-07T21:52
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007203030.png)
 
 #### Implementation - 2、Model Design
-![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250817144743432.png)
-
 ![image.png|603](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007204548.png)
 - hidden_size , n_layers 和 GRU有关。
 - <mark style="background: FFFF00;">n_directions 含义</mark>
 	- 双向和单向
 	- ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007203938.png)
 	- ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007204045.png)
-	- 最终输出 ==output是上面的，hidden = $[h_{N}^f,h_{N}^b]$==
+	- 最终输出 output是上面的，hidden = $[h_{N}^f,h_{N}^b]$
 
 	
 
@@ -63,19 +58,11 @@ updated: 2024-10-07T21:52
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007210329.png)
 - embedding 维度
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007210753.png)
-- **pack_padded_sequence**
-	- 需要输入 embedding,seq_lengths(每个样本的序列长度)
-	- ==为了解决填充完0后，不让这些进入计算过程，加快计算速度。==
+- pack_padded_sequence
+	- 输入 embedding,seq_lengths(每个样本的序列长度)
+	- 为了解决填充完0后，不让这些进入计算过程，加快计算速度。
 ![image.png|573](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007211317.png)
-![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250817151543328.png)
-### 维度解释
-#### **batch_size表示模型一次处理的单词有多少个**
-#### **seqLen表示每个单词最多有多少个字母组成**
-#### **hiddensize表示嵌入层表示每一个字母需要多少个维度。**
-![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250817153439625.png)
-
-- packed_padded_sequences函数的具体操作是
-	- 把上图每一行按顺序，也就是batch_size 9的第1,2,3等等按顺序竖着组合在一起，并记录了9个单词非空字母的长度序列也就是10，8，7等等，方便GRU进行运算
+![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007211510.png)
 - 横着的是batch_size。这也是GRU可以接收的输入 packedSequence对象。
 - 如果是双向的，需要把hidden拼接
 	- ![image.png|514](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007211809.png)
