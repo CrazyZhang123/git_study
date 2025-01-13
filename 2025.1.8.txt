@@ -14,5 +14,8 @@ nihao
 关联本地分支与远程分支
 git branch --set-upstream-to=origin/zjj_test_1_8  zjj_test_1_8  
 
+<<<<<<< HEAD
 第三次测试 merge
-merge 测试ssh -T git@github.com
+// git bash 有冲突测试
+合并冲突 2025/1/13 19:40
+>>>>>>> zjj_test_1_8
