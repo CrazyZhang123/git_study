@@ -8,3 +8,6 @@ nihao
 学习记录：
 关联本地分支与远程分支
 git branch --set-upstream-to=origin/zjj_test_1_8  zjj_test_1_8  
+
+// git bash 有冲突测试
+合并冲突 2025/1/13 19:40
