@@ -1,6 +1,6 @@
 ---
 created: 2024-09-30T12:12
-updated: 2024-12-22T16:33
+updated: 2025-01-19T22:10
 ---
 ### 1、torch.nn.Linear()讲解
 
@@ -656,7 +656,7 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 
 #### （1）[词嵌入](https://so.csdn.net/so/search?q=%E8%AF%8D%E5%B5%8C%E5%85%A5&spm=1001.2101.3001.7020)简介
 
-  关于词嵌入，[这篇文章](https://blog.csdn.net/qq_41477675/article/details/114645012)讲的挺清楚的，相比于One-hot编码，Embedding方式更方便计算，例如在“就在江湖之上”整个词典中，要编码“江湖”两个字，One-hot编码需要 [ l e n g t h , w o r d _ c o u n t ] {[length, word\_count]} [length,word_count] 大小的张量，其中 w o r d _ c o u n t {word\_count} word_count 为词典中所有词的总数，而Embedding方式的嵌入维度 e m b e d d i n g _ d i m {embedding\_dim} embedding_dim 可远远小于 w o r d _ c o u n t {word\_count} word_count 。在运用Embedding方式编码的词典时，只需要词的索引，下图例子中： “江湖”——>[2, 3]
+  关于词嵌入，[这篇文章](https://blog.csdn.net/qq_41477675/article/details/114645012)讲的挺清楚的，相比于One-hot编码，Embedding方式更方便计算，例如在“就在江湖之上”整个词典中，要编码“江湖”两个字，One-hot编码需要大小的张量，其中${word\_count} $为词典中所有词的总数，而Embedding方式的嵌入维度${embedding\_dim} $ 可远远小于 ${word\_count} $。在运用Embedding方式编码的词典时，只需要词的索引，下图例子中： “江湖”——>[2, 3]
 
 ![在这里插入图片描述](https://gitee.com/zhang-junjie123/picture/raw/master/image/f1137cd85b74b625b73005c4684b7a60.png)
 
@@ -672,7 +672,7 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 
   **③ padding_idx (int, optional)：** 填充索引，在padding_idx处的嵌入向量在训练过程中没有更新，即它是一个固定的“pad”。对于新构造的Embedding，在padding_idx处的嵌入向量将默认为全零，但可以更新为另一个值以用作填充向量。
 
-输入： I n p u t ( ∗ ) {Input(∗)} Input(∗): IntTensor 或者 LongTensor，为任意size的张量，包含要提取的所有词索引。 输出： O u t p u t ( ∗ , H ) {Output(∗, H)} Output(∗,H): ∗ {∗} ∗ 为输入张量的size， H {H} H = embedding_dim
+输入：$ {Input(∗)} $: IntTensor 或者 LongTensor，为任意size的张量，包含要提取的所有词索引。 输出： ${Output(∗, H)} $: $ {∗} $ 为输入张量的size， ${H} $ = embedding_dim
 
 ### 2. torch.nn.Embedding用法
 
@@ -685,13 +685,13 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
  import torch.nn as nn  
  ​  
  embedding = nn.Embedding(10, 3)  
- x = torch.LongTensor([[1, 2, 4, 5], [4, 3, 2, 9]])  
+ x = torch.LongTensor([[1, 2, 4, 5], [4, 3, 2, 9]])  # (2,4)
  ​  
  y = embedding(x)  
  ​  
  print('权重:\n', embedding.weight)  
  print('输出:')  
- print(y)
+ print(y) # 维度 (2,)
 ```
 
 查看权重与输出，打印如下：
@@ -1279,7 +1279,7 @@ print(f"Sample Image Shape: {sample_image.shape}")
 print(f"Sample Label: {sample_label}") 
 # 输出: Sample Label: 3
 ```
- 
+
 在这个例子中，我们创建了一个包含100张图像和对应标签的 ` TensorDataset ` 。通过 ` dataset[0] ` ，我们可以访问第一个样本的图像和标签。
 
 ##### 2. 组合多个特征张量
@@ -1296,7 +1296,7 @@ sample_feature1, sample_feature2 = dataset[0]
 print(f"Sample Feature1 Shape: {sample_feature1.shape}")  # 输出: Sample Feature1 Shape: torch.Size([50])
 print(f"Sample Feature2 Shape: {sample_feature2.shape}")  # 输出: Sample Feature2 Shape: torch.Size([30])
 ```
- 
+
 在这个例子中，我们创建了一个包含两个特征张量的 ` TensorDataset ` ，并通过 ` dataset[0] ` 访问第一个样本的两个特征。
 #### DataLoader 详解
 
@@ -1304,7 +1304,7 @@ print(f"Sample Feature2 Shape: {sample_feature2.shape}")  # 输出: Sample Featu
 ##### 1. [批量处理](https://edu.csdn.net/cloud/ml_summit?utm_source=glcblog&amp;spm=1001.2101.3001.7020 )数据
  ` DataLoader ` 可以将数据集划分为多个批次（batch），便于[模型训练](https://edu.csdn.net/cloud/ml_summit?utm_source=glcblog&amp;spm=1001.2101.3001.7020 )。
 
- 
+
 ```python
 from torch.utils.data import DataLoader 
 # 创建 DataLoader
@@ -1316,11 +1316,11 @@ for batch_features, batch_labels in train_loader:
 	print(f"Batch Labels Shape: {batch_labels.shape}")  # 输出: Batch Labels Shape: torch.Size([32])    
 	# 这里可以进行训练操作，如前向传播、反向传播等
 ```
- 
+
 在这个例子中， ` train_loader ` 将数据集划分为大小为32的批次。通过遍历 ` train_loader ` ，我们可以轻松地获取每个批次的特征和标签。
 
 ##### 2. 数据打乱
- 
+
  ` DataLoader ` 可以通过设置 ` shuffle=True ` 来在每个 epoch 开始时随机打乱数据，避免模型学习到数据的顺序。
 
 ```python
@@ -1387,11 +1387,11 @@ for epoch in range(2):
 #### 文章目录
 
 - [pytorch中的transforms.ToTensor和transforms.Normalize理解🌴](#pytorchtransformsToTensortransformsNormalize_10)
-    
+  
 - - [transforms.ToTensor🌵](#transformsToTensor_12)
         
     - [transforms.Normalize🌵](#transformsNormalize_75)
-        
+      
 
 
 ### transforms.ToTensor🌵
@@ -1407,16 +1407,16 @@ for epoch in range(2):
   大概的意思就是说，`transforms.ToTensor()`可以将PIL和numpy格式的数据从[0,255]范围转换到[0,1] ，具体做法其实就是将原始数据除以255。另外原始数据的shape是（H x W x C），通过`transforms.ToTensor()`后shape会变为（C x H x W）。这样说我觉得大家应该也是能理解的，这部分并不难，但想着还是用一些例子来加深大家的映像🌽🌽🌽
 
 - 先导入一些包
-    
+  
 ```
  import cv2  
  import numpy as np  
  import torch  
  from torchvision import transforms
 ```
-    
+
 - 定义一个数组[模型](https://edu.csdn.net/cloud/ml_summit?utm_source=glcblog&spm=1001.2101.3001.7020)图片，注意数组数据类型需要时np.uint8【官方图示中给出】
-    
+  
 ```
 data = np.array([  
 			 [[1,1,1],[1,1,1],[1,1,1],[1,1,1],[1,1,1]],  
@@ -1426,17 +1426,17 @@ data = np.array([
 			 [[5,5,5],[5,5,5],[5,5,5],[5,5,5],[5,5,5]]  
 	 ],dtype='uint8')
 ```
-    
+
 这是可以看看data的shape，注意现在为（W H C）。
     
 ![image-20220416120518895](https://gitee.com/zhang-junjie123/picture/raw/master/image/37da4fd4becceba642e1b122a63019cb.png)
     
 - 使用`transforms.ToTensor()`将data进行转换
-    
+  
 ```
 data = transforms.ToTensor()(data)
 ```
-    
+
 这时候我们来看看data中的数据及shape。
     
 ![image-20220416120811156](https://gitee.com/zhang-junjie123/picture/raw/master/image/4d5b0f134386cf8b247a87e76cc569cf.png)
@@ -1468,7 +1468,7 @@ data = transforms.ToTensor()(data)
  读到这里大家是不是以为就完了呢？这里还想和大家唠上一唠🍓🍓🍓上面的两个参数（0.5，0.5，0.5）是怎么得来的呢？这是根据数据集中的数据计算出的均值和标准差，所以往往不同的数据集这两个值是不同的🍏🍏🍏这里再举一个例子帮助大家理解其计算过程。同样采用上文例子中提到的数据。
 
 - 上文已经得到了经ToTensor转换后的数据，现需要求出该数据每个通道的mean和std。【这一部分建议大家自己运行看看每一步的结果🌵🌵🌵】
-    
+  
 ```
  # 需要对数据进行扩维，增加batch维度  
  data = torch.unsqueeze(data,0)    #在pytorch中一般都是（batch,C,H,W）  
@@ -1490,9 +1490,9 @@ data = transforms.ToTensor()(data)
  print(channel_mean, channel_std)   #结果为tensor([0.0118, 0.0118, 0.0118]) tensor([0.0057, 0.0057, 0.0057])  
 ```
      ​
-    
+
 - 将上述得到的mean和std带入公式，计算输出。
-    
+  
 ```
  for i in range(3):  
 	 data[i] = (data[i] - channel_mean[i]) / channel_std[i]  
@@ -1528,24 +1528,24 @@ data = transforms.ToTensor()(data)
 - https://zhuanlan.zhihu.com/p/29923090
 
 - https://zhuanlan.zhihu.com/p/65609544
- 
+
 # 20、torch.nn.Parameter()
 
 [[PyTorch中的torch.nn.Parameter() 详解-CSDN博客]]
- 
+
 **简单总结：**
 首先可以把这个函数理解为类型[转换函数](https://edu.csdn.net/cloud/houjie?utm_source=highword&spm=1001.2101.3001.7020)，将一个不可训练的类型`Tensor`转换成可以训练的类型`parameter`并将这个`parameter`绑定到这个`module`里面(`net.parameter()`中就有这个绑定的`parameter`，所以在参数优化的时候可以进行优化的)，所以经过类型转换这个`self.v`变成了[模型](https://edu.csdn.net/cloud/ml_summit?utm_source=glcblog&spm=1001.2101.3001.7020)的一部分，成为了模型中根据训练可以改动的参数了。使用这个函数的目的也是想让某些变量在学习的过程中不断的修改其值以达到最优化。
 
- 
+
 # 21、torch.view和torch.reshape
 [[Pytorch_ view()和reshape()的区别？他们与continues()的关系是什么？]]
 正常用，基本没区别
- 
+
 
 
 # 22、model.apply(fn)或net.apply(fn)
 [[model.apply(fn)或net.apply(fn)-CSDN博客]]
- 
+
 pytorch中的`model.apply(fn)`会递归地将函数`fn`应用到父模块的每个子模块`submodule`，也包括`model`这个父模块自身。 
 fn的参数就是每个模块。
 
@@ -1558,11 +1558,11 @@ $$
 但是，在具体的应用中跟定义稍有不同。主要差别是参数的设置，在[torch](https://so.csdn.net/so/search?q=torch&spm=1001.2101.3001.7020).nn.MSELoss中有一个reduction参数。reduction是维度要不要缩减以及如何缩减主要有三个选项：
 
 - **‘none’**:no reduction will be applied.
-    
+  
 - **‘mean’**: the sum of the output will be divided by the number of elements in the output.
-    
+  
 - **‘sum’**: the output will be summed.
-    
+  
 
   如果不设置reduction参数，**默认是’mean’**。 下面看个例子：
 
@@ -1602,7 +1602,7 @@ $$
 
  
 
-                
+​                
 
-        
+​        
 
