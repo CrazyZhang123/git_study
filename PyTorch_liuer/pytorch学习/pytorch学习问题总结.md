@@ -1,6 +1,6 @@
 ---
 created: 2024-09-30T12:12
-updated: 2025-01-19T22:10
+updated: 2025-01-23T00:07
 ---
 ### 1、torch.nn.Linear()讲解
 
@@ -1040,7 +1040,8 @@ out1 = torch.matmul(x,y)  
 
 向量与矩阵做矩阵乘法运算时，需对向量进行增维操作，将其变成2维矩阵，矩阵相乘结束后，结果中增加的维度需要被删除。
 
-1）向量![a\in R^{m}](https://latex.csdn.net/eq?a%5Cin%20R%5E%7Bm%7D)与矩阵![B\in R^{m*n}](https://latex.csdn.net/eq?B%5Cin%20R%5E%7Bm*n%7D)相乘，需先将向量变成矩阵![A\in R^{1*m}](https://latex.csdn.net/eq?A%5Cin%20R%5E%7B1*m%7D)，矩阵乘法维度变化：(1×m)×(m×n)->(1×n)，乘法运算结果矩阵![R^{1*n}](https://latex.csdn.net/eq?R%5E%7B1*n%7D)需删除新增维度，删除后的结果变成长度为n的1维向量![R^{n}](https://latex.csdn.net/eq?R%5E%7Bn%7D)。
+
+1）向量$a\in R^{m}$与矩阵$B\in R^{m*n}$相乘，需先将向量变成矩阵$A\in R^{1*m}$，矩阵乘法维度变化：(1×m)×(m×n)->(1×n)，乘法运算结果矩阵$R^{1*n}$需删除新增维度，删除后的结果变成长度为n的1维向量$R^{n}$。
 
 ```
  x = torch.tensor([2,3])
@@ -1601,7 +1602,8 @@ $$
 本文转自 [https://blog.csdn.net/zfhsfdhdfajhsr/article/details/115637954](https://blog.csdn.net/zfhsfdhdfajhsr/article/details/115637954)，如有侵权，请联系删除。
 
  
-
+# 24、torch.expand和repeat函数
+[[【Pytorch】对比expand和repeat函数]]
 ​                
 
 ​        
