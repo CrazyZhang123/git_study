@@ -1,6 +1,6 @@
 ---
 created: 2025-01-17T21:56
-updated: 2025-01-17T23:51
+updated: 2025-01-24T00:14
 ---
 【BERT从零详细解读，看不懂来打我】 https://www.bilibili.com/video/BV1Ey4y1874y/?share_source=copy_web&vd_source=237c1070b237a59068e4928b71e5140e
 
@@ -98,3 +98,9 @@ Weighted decay修改后的adam，使用warmup，搭配线性衰减
 
 以及可以采用**数据增强/自蒸馏/外部知识的融入**
 
+### 代码讲解
+![image.png|681](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250124000838.png)
+### MLM-掩码语言模型
+![image.png|610](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250124001121.png)
+### 主体框架
+![aa](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250124001323.png)
