@@ -1554,7 +1554,7 @@ fn的参数就是每个模块。
 
 MSE: Mean Squared Error（**均方误差**） 含义：**均方误差**，是预测值与真实值之差的平方和的平均值，即： 
 $$
-\begin{aligned} MSE =\cfrac {1}{N}\sum_{i=1}^n(x_i-y_i)^2 \end{aligned} 
+\begin{aligned} MSE =\cfrac {1}{N}\sum_{i=1}^n(x_i-y_i)^2 \end{aligned}
 $$
 但是，在具体的应用中跟定义稍有不同。主要差别是参数的设置，在[torch](https://so.csdn.net/so/search?q=torch&spm=1001.2101.3001.7020).nn.MSELoss中有一个reduction参数。reduction是维度要不要缩减以及如何缩减主要有三个选项：
 
@@ -1601,10 +1601,130 @@ $$
 
 本文转自 [https://blog.csdn.net/zfhsfdhdfajhsr/article/details/115637954](https://blog.csdn.net/zfhsfdhdfajhsr/article/details/115637954)，如有侵权，请联系删除。
 
- 
+
 # 24、torch.expand和repeat函数
 [[【Pytorch】对比expand和repeat函数]]
-​                
 
 ​        
 
+25、随机数相关
+
+一、😅 如何生成随机数？
+-------------
+
+1.  **torch.rand()**
+
+  `torch.rand()`函数用于生成具有**均匀分布**的随机数，这些随机数的范围在\[0, 1)之间。它接受一个形状参数（shape），返回一个指定形状的张量（Tensor）。
+
+示例代码：
+
+```python
+import torch
+
+# 生成一个形状为(3, 4)的张量，元素值在[0, 1)之间
+tensor = torch.rand((3, 4))
+print(tensor)
+```
+
+输出：
+
+```less
+tensor([[0.1490, 0.7928, 0.0411, 0.5075],
+        [0.0754, 0.8043, 0.7533, 0.1298],
+        [0.5087, 0.1185, 0.6706, 0.9509]])
+
+进程已结束,退出代码0
+```
+
+2.  **torch.randn()**
+
+  `torch.randn()`函数用于生成具有**标准正态分布**的随机数，即均值为0，标准差为1的随机数。它同样接受一个形状参数，并返回一个指定形状的张量。
+
+示例代码：
+
+```python
+import torch
+
+# 生成一个形状为(3, 4)的张量，元素值服从标准正态分布
+tensor = torch.randn((3, 4))
+print(tensor)
+print("均值:", tensor.mean().item())
+print("标准差:", tensor.std().item())
+```
+
+输出：
+
+```less
+tensor([[ 1.7490, -0.1910, -0.6926,  0.2398],
+        [ 0.9135, -0.3359,  1.0442,  0.7824],
+        [-0.7138,  0.1682, -1.2245, -0.3747]])
+均值: 0.1137121245265007
+标准差: 0.868906557559967
+
+进程已结束,退出代码0
+```
+
+3.  **torch.randint()**
+
+  `torch.randint()`函数用于生成**指定范围内的整数随机数**。它接受三个参数：low（最小值）、high（最大值）和形状（shape）。返回的张量中的元素值将在\*\*\[low, high)\*\*范围内。
+
+示例代码：
+
+```python
+import torch
+
+# 生成一个形状为(3, 4)的张量，元素值在[0, 10)之间
+tensor = torch.randint(0, 10, (3, 4))
+print(tensor)
+```
+
+输出：
+
+```less
+tensor([[4, 0, 8, 4],
+        [0, 9, 4, 3],
+        [0, 3, 9, 3]])
+
+进程已结束,退出代码0
+```
+
+4.  **torch.randperm()**
+
+  `torch.randperm()`函数用于**生成一个从0到n-1的随机整数排列**。它接受一个参数n，返回一个长度为n的张量，其中包含从0到n-1的随机整数，**每个整数只出现一次**。
+
+示例代码：
+
+```python
+import torch
+
+# 生成一个长度为10的随机整数排列
+tensor = torch.randperm(10)
+print(tensor)
+```
+
+输出：
+
+```less
+tensor([0, 7, 1, 2, 9, 6, 3, 5, 4, 8])
+
+进程已结束,退出代码0
+```
+
+二、🎯 其他注意事项
+-----------
+
+*   在使用随机数函数时，需要注意生成的随机数是否满足你的需求，比如分布类型、范围等。
+*   在进行深度学习实验时，设置随机数种子（random seed）可以帮助我们复现实验结果。可以使用`torch.manual_seed()`函数来设置随机数种子。
+*   生成随机数时，要注意张量的形状和数据类型，确保它们与你的模型和数据相匹配。
+
+
+
+# 25、torch转置函数
+
+[[PyTorch 两大转置函数 transpose() 和 permute()]]
+
+
+
+# 26、torch Conv1d 和 linear
+
+[[PyTorch实现MLP的两种方法，以及nn.Conv1d, kernel]]
