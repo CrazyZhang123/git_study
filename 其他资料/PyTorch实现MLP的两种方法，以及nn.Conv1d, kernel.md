@@ -1,3 +1,7 @@
+---
+created: 2025-01-23T21:22
+updated: 2025-01-23T21:51
+---
  
 
 #### [PyTorch](https://so.csdn.net/so/search?q=PyTorch&spm=1001.2101.3001.7020)实现MLP的两种方法，以及nn.Conv1d, kernel\_size=1和nn.Linear的区别
