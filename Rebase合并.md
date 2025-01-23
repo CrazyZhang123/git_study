@@ -1,6 +1,6 @@
 ---
 created: 2025-01-23T00:44
-updated: 2025-01-23T00:44
+updated: 2025-01-23T21:51
 ---
 # Rebase 处理合并冲突
 
@@ -23,7 +23,7 @@ git checkout redmiBook
 ![image-20250120223412542](https://gitee.com/zhang-junjie123/picture/raw/master/image/image-20250120223412542.png)
 
 ##### 3、rebase 目标合并的本地分支 [targetBranchName] 
-
+是想要把redmiBook分支分支合并到main分支
 ```
  // [targetBranchName] 也就是 main
  git rebase main
