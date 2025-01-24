@@ -124,7 +124,7 @@ ELMo and its predecessor (Peters et al., 2017, 2018a) generalize traditional wor
 As with the feature-based approaches, the first works in this direction only pre-trained word embedding parameters from unlabeled text (Collobert and Weston, 2008).
 
  与基于特征的方法一样，这个方向上的**早期工作仅从无标签文本中预训练词嵌入参数**（科洛伯特和韦斯顿，2008）。 
- 
+
 More recently, sentence or document encoders which produce contextual token representations have been pre-trained from unlabeled text and fine-tuned for a supervised downstream task (Dai and Le, 2015; Howard and Ruder, 2018; Radford et al., 2018). The advantage of these approaches is that few parameters need to be learned from scratch. At least partly due to this advantage, OpenAI GPT (Radford et al., 2018) achieved previously state-of-the-art results on many sentence level tasks from the GLUE benchmark (Wang et al., 2018a). Left-to-right language model ing and auto-encoder objectives have been used for pre-training such models (Howard and Ruder, 2018; Radford et al., 2018; Dai and Le, 2015).
 
 最近，**从无标签文本中预训练，并针对有监督的下游任务进行微调，的产生上下文词符表示的句子或文档编码器已经出现**（戴和乐，2015；霍华德和鲁德，2018；拉德福德等人，2018）。这些方法的优点是几乎不需要从头学习参数。至少部分由于这一优势，OpenAI GPT（拉德福德等人，2018）在 GLUE 基准测试（王等人，2018a）的许多句子级任务上取得了先前的最先进结果。从左到右的语言建模和自动编码器目标已被用于预训练此类模型（霍华德和鲁德，2018；拉德福德等人，2018；戴和乐，2015）。
@@ -259,7 +259,7 @@ In order to train a deep bidirectional representation, we simply mask some perce
 
 Although this allows us to obtain a bidirectional pre-trained model, a downside is that we are creating a mismatch between pre-training and fine-tuning, since the [MASK] token does not appear during fine-tuning. To mitigate this, we do not always replace “masked” words with the actual [MASK] token. The training data generator chooses 15% of the token positions at random for prediction. If the i-th token is chosen, we replace the $\bar{\imath}$ -th token with (1) the [MASK] token 80% of the time (2) a random token 10% of the time (3) the unchanged i -th token 10% of the time. Then, $T_{i}$ will be used to predict the original token with cross entropy loss. We compare variations of this procedure in Appendix C.2.
 
-尽管这能让我们获得一个双向预训练模型，但不利的一面在于，我们造成了**预训练和微调之间的不匹配，因为[MASK]标记在微调阶段并不会出现**。为了缓解这一问题，我们**并非总是用实际的[MASK]标记来替换“被掩码”的单词。训练数据生成器会随机选取15%的词元位置来进行预测**。如果第\(i\)个词元被选中，我们会按以下方式替换第\(i\)个词元：（1）80%的概率将其替换为[MASK]标记；（2）10%的概率替换为一个随机词元；（3）10%的概率保持第\(i\)个词元不变。然后，将使用\(T_{i}\)通过交叉熵损失来预测原始词元。我们在附录C.2中对这一流程的不同变体进行了比较。
+尽管这能让我们获得一个双向预训练模型，但不利的一面在于，我们造成了**预训练和微调之间的不匹配，因为[MASK]标记在微调阶段并不会出现**。为了缓解这一问题，我们**并非总是用实际的[MASK]标记来替换“被掩码”的单词。训练数据生成器会随机选取15%的词元位置来进行预测**。如果第\(i\)个词元被选中，我们会按以下方式替换第\(i\)个词元：（1）80%的概率将其替换为[MASK]标记；（2）10%的概率替换为一个随机词元；（3）10%的概率保持第\(i\)个词元不变。然后，将使用\($T_{i}$\)通过交叉熵损失来预测原始词元。我们在附录C.2中对这一流程的不同变体进行了比较。
 
 **Task #2: Next Sentence Prediction (NSP)**
 Many important downstream tasks such as Question Answering (QA) and Natural Language Inference (NLI) are based on understanding the relationship between two sentences, which is not directly captured by language modeling. In order to train a model that understands sentence relationships, we pre-train for a binarized next sentence prediction task that can be trivially generated from any monolingual corpus. Specifically, when choosing the sentences A and B for each pretraining example, 50% of the time B is the actual next sentence that follows A (labeled as IsNext), and 50% of the time it is a random sentence from the corpus (labeled as NotNext). As we show in Figure 1, c is used for next sentence prediction (NSP).5 Despite its simplicity, we demonstrate in Section 5.1 that pre-training towards this task is very beneficial to both QA and NLI. 6
@@ -360,7 +360,7 @@ BERT作为其组件之一的条目。
 The General Language Understanding Evaluation (GLUE) benchmark (Wang et al., 2018a) is a collection of diverse natural language understanding tasks. Detailed descriptions of GLUE datasets are included in Appendix B.1.
 
  通用语言理解评估（GLUE）基准（Wang等人，2018a）是一组多样化的自然语言理解任务。GLUE数据集的详细描述包含在附录B.1中。 
- 
+
 To fine-tune on GLUE, we represent the input sequence (for single sentence or sentence pairs) as described in Section 3, and use the final hidden vector $C \in \mathbb{R}^{H}$ corresponding to the first input token ([CLS]) as the aggregate representation. The only new parameters introduced during fine-tuning are classification layer weights $W E$ $\mathbb{R}^{K ×H}$ , where K is the number of labels. We compute a standard classification loss with c and W , i.e., log(softmax( $(C W^{T})$ .
 
  为了在GLUE上进行微调，我们按照第3节所述来表示输入序列（针对单句或句对），并使用与首个输入词元（[CLS]）对应的最终隐藏向量\($C\in\mathbb{R}^{H}$\)作为聚合表示。在微调过程中引入的唯一新参数是分类层权重\($W\in\mathbb{R}^{K\times H}$\)，其中\(K\)是标签的数量。我们利用\(C\)和\(W\)计算标准的分类损失，即\($\log(\text{softmax}(C W^{T}))$\)。
