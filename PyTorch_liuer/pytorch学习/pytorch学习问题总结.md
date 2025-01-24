@@ -1,6 +1,6 @@
 ---
 created: 2024-09-30T12:12
-updated: 2025-01-23T00:07
+updated: 2025-01-23T21:52
 ---
 ### 1、torch.nn.Linear()讲解
 
@@ -1721,8 +1721,7 @@ tensor([0, 7, 1, 2, 9, 6, 3, 5, 4, 8])
 
 # 25、torch转置函数
 
-[[PyTorch 两大转置函数 transpose() 和 permute()]]
-
+[[深度学习/git_study/其他资料/PyTorch 两大转置函数 transpose() 和 permute()]]
 
 
 # 26、torch Conv1d 和 linear
