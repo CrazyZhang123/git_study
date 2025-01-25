@@ -1,6 +1,6 @@
 ---
 created: 2024-09-30T12:12
-updated: 2025-01-23T21:52
+updated: 2025-01-26T00:20
 ---
 ### 1、torch.nn.Linear()讲解
 
@@ -1727,3 +1727,24 @@ tensor([0, 7, 1, 2, 9, 6, 3, 5, 4, 8])
 # 26、torch Conv1d 和 linear
 
 [[PyTorch实现MLP的两种方法，以及nn.Conv1d, kernel]]
+
+# 27、torch.gather函数
+[[图解PyTorch中的torch.gather函数]]
+
+[[【PyTorch】Torch.gather()用法详细图文解释]]
+
+简单理解
+![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250126001452.png)
+
+根据dim来确定index\[i]\[j]\[k]需要替换的input的索引位置和值来取数。
+
+# 28、激活函数
+### 1. GELU 激活函数的定义如下：
+
+$$ \text{GELU}(x) = x \cdot \Phi(x) $$
+
+ 其中，$\Phi(x)$ 是标准正态分布的累积分布函数（CDF），可以近似为：
+
+ $$ \Phi(x) \approx 0.5 \cdot (1 + \text{erf}(\frac{x}{\sqrt{2}})) $$
+
+这里，$\text{erf}(x)$ 是误差函数。
