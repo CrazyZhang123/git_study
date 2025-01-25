@@ -86,7 +86,7 @@ git branch 图
 
 
 
-## Merge和rebase区别
+# Merge和rebase区别
 
 > 在 Git 的交汇处，每一次选择都是代码旅程的新起点。
 
@@ -108,6 +108,8 @@ Merge的原理很简单，就是**将要合并分支的最新提交组合成一�
 
 现在你想要把 main 分支 merge 到你的 feature 分支上去，那么 git 会把两个分支的最新提交4和5合并成一个提交，并且合入目标分支 feature，也就是：
 
+// **main分支合并到feature分支**
+
 ```bash
 git checkout feature
 git merge main
@@ -126,6 +128,8 @@ git merge main
 ### Rebase | 提交历史的线性编织
 
 [rebase](https://zhida.zhihu.com/search?content_id=240694154&content_type=Article&match_order=1&q=rebase&zhida_source=entity) 的使用方式与 merge 类似：
+
+**让现在的 feature 分支基于最新的 main 分支进行变基**（创建副本并且移动到末尾）  
 
 ```bash
 git checkout feature
