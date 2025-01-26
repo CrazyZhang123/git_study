@@ -86,65 +86,60 @@ git branch 图
 
 # Merge使用
 
-## 提取远程仓库
+git fetch和git pull
 
-Git 有两个命令用来提取远程仓库的更新。
+前面提到，`git pull` 的过程可以理解为：
 
-1、从远程仓库下载新分支与数据：
-
-```
-git fetch
-```
-
-该命令执行完后需要执行 git merge 远程分支到你所在的分支。
-
-2、从远端仓库提取数据并尝试合并到当前分支：
-
-```
-git merge
+```cpp
+git fetch origin master //从远程主机的master分支拉取最新内容 
+git merge FETCH_HEAD    //将拉取下来的最新内容合并到当前所在的分支中
 ```
 
-该命令就是在执行 **git fetch** 之后紧接着执行 **git merge** 远程分支到你所在的任意分支。
+即将远程主机的某个分支的更新取回，并与本地指定的分支合并，完整格式可表示为：
 
-![img](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250126095114598.png)
-
-假设你配置好了一个远程仓库，并且你想要提取更新的数据，你可以首先执行 **git fetch [alias]** 告诉 Git 去获取它有你没有的数据，然后你可以执行 **git merge [alias]/[branch]** 以将服务器上的任何更新（假设有人这时候推送到服务器了）合并到你的当前分支。
-
-接下来我们在 Github 上点击" README.md" 并在线修改它:
-
-![img](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250126095129447.jpeg)
-
-然后我们在本地更新修改。
-
-```
-$ git fetch origin
-remote: Counting objects: 3, done.
-remote: Compressing objects: 100% (2/2), done.
-remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
-Unpacking objects: 100% (3/3), done.
-From github.com:tianqixin/runoob-git-test
-   0205aab..febd8ed  master     -> origin/master
+```xml
+$ git pull <远程主机名> <远程分支名>:<本地分支名>
 ```
 
-以上信息"0205aab..febd8ed master -> origin/master" 说明 master 分支已被更新，我们可以使用以下命令将更新同步到本地：
+如果远程分支是与当前分支合并，则冒号后面的部分可以省略：
 
-```
-$ git merge origin/master
-Updating 0205aab..febd8ed
-Fast-forward
- README.md | 1 +
- 1 file changed, 1 insertion(+)
+```ruby
+$ git pull origin next
 ```
 
-查看 README.md 文件内容：
+## 我的测试
+
+将main分支fetch到本地，然后合并到redmibook分支，解决冲突，然后完成合并。
+
+### 1、fetch main分支到本地
 
 ```
-$ cat README.md 
-# 菜鸟教程 Git 测试
-## 第一次修改内容
+张俊杰@MI-202411011047 MINGW64 /d/workspace/git_study/git_study (redmiBook)
+$ git fetch origin main
+remote: Enumerating objects: 36, done.
+remote: Counting objects: 100% (36/36), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 23 (delta 15), reused 23 (delta 15), pack-reused 0 (from 0)
+Unpacking objects: 100% (23/23), 18.39 KiB | 254.00 KiB/s, done.
+From github.com:CrazyZhang123/git_study
+ * branch            main       -> FETCH_HEAD
+   c8f17e6..ac3df2d  main       -> origin/main
 ```
 
-------
+### 2、将FETCH_HEAD分支合并到 redmiBook
+
+也可以 git merge origin/main,从上面输出可以看到
+
+```
+张俊杰@MI-202411011047 MINGW64 /d/workspace/git_study/git_study (redmiBook)
+$ git merge FETCH_HEAD
+Auto-merging Rebase合并.md
+CONFLICT (content): Merge conflict in Rebase合并.md
+Auto-merging TRM.ipynb
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+
 
 ## 推送到远程仓库
 

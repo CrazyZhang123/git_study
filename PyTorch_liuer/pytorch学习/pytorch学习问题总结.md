@@ -45,7 +45,7 @@ print("Output shape:", output.shape)
 
 我画了个计算维度变换图，如下：
 
-![image.png|504](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241123160008.png)
+<img src="https://gitee.com/zhang-junjie123/picture/raw/master/image/20241123160008.png" alt="啊、" style="zoom:67%;" />
 
 
 
@@ -88,11 +88,13 @@ y = xA^T + b
 
 ### 2、Tensor常见方法
 
-.item ()  
-把 tensor 转为 python 的 float 类型
+`.item() `
+用于从单元素张量tensor转为 python 的 float 类型
 
-.numpy ()  
-将张量转换为与其共享底层存储的 n 维 numpy 数组
+`.numpy ()`  
+将张量tensor转换为与其共享底层存储的 n 维 numpy 数组
+
+`.data` 是一个属性，用于获取张量的底层数据。它返回一个新的张量，该张量与原始张量共享相同的数据，但不会跟踪梯度。
 
 对Tensor维度的理解：
 ```python
@@ -115,6 +117,18 @@ tensor([[0.],
 ### 3、torch.max,full,ones,zeros
 #### 一、一个参数时的 [torch](https://so.csdn.net/so/search?q=torch&spm=1001.2101.3001.7020).max()
 返回Tensor的最大值
+
+示例
+
+```
+# data.max(2) 方法沿着第三个维度（即词汇表维度）找到最大值。max(2) 返回两个张量：
+# 最大值和最大值的索引。通过 [1] 选择最大值的索引，然后通过 [0] 选择第一个批次的结果。
+# 最后，使用 data.numpy() 将结果转换为 NumPy 数组。
+logits_lm = logits_lm.data.max(2)[1][0].data.numpy()
+# -- from BERT.ipynb
+```
+
+
 
 #### 二、增加指定维度时的 torch.max()
 
@@ -152,6 +166,14 @@ torch.return_types.max(
 values=tensor([0.6035, 2.0575, 1.0107, 0.7016]),
 indices=tensor([3, 2, 0, 2]))
 ```
+#### 理解dim
+
+dim如果是**最后一个维度**，可以拆成这样理解，求完最后一个维度的最大值，这个维度就消失了，按下图的结果维度应该是
+
+从[2,3,4]变为了[2,3]。
+
+<img src="https://gitee.com/zhang-junjie123/picture/raw/master/image/20250126162039523.png" alt="在这里插入图片描述" style="zoom: 80%;" />
+
 #### 三、两个输入张量时的 torch.max()
 
 ###### 1. 函数介绍
@@ -635,16 +657,16 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 ```python
  import torch  
  import numpy as np  
- ​  
+   
  batch_size=3  
  seq_length=4  
- ​  
+ 
  input_data=np.random.uniform(0,19,size=(batch_size,seq_length))#shape(3,4)  
- ​  
+   
  input_data=torch.from_numpy(input_data).long()   
- ​  
+   
  embedding_layer=torch.nn.Embedding(vocab_size,embedding_dim)   
- ​  
+ 
  lstm_input=embedding_layer(input_data)#shape(3,4,6)
 ```
 
@@ -683,12 +705,12 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 ```
  import torch  
  import torch.nn as nn  
- ​  
+  
  embedding = nn.Embedding(10, 3)  
  x = torch.LongTensor([[1, 2, 4, 5], [4, 3, 2, 9]])  # (2,4)
- ​  
+  
  y = embedding(x)  
- ​  
+  
  print('权重:\n', embedding.weight)  
  print('输出:')  
  print(y) # 维度 (2,)
@@ -716,7 +738,7 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
           [-0.0315, -1.2234, -0.4589],  
           [-1.0621, -0.1466,  1.7412],  
           [ 1.0708, -0.7888, -0.0177]],  
- ​  
+  
          [[-1.0621, -0.1466,  1.7412],  
           [ 0.6131, -0.4381,  0.1253],  
           [-0.0315, -1.2234, -0.4589],  
@@ -736,7 +758,7 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 
  import torch  
  import torch.nn as nn  
- ​  
+  
  weight = torch.FloatTensor([[1, 2.3, 3], [4, 5.1, 6.3]])  
  embedding = nn.Embedding.from_pretrained(weight)  
  x = torch.LongTensor([1, 0, 0])  
@@ -759,7 +781,7 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 ```
  import torch  
  import torch.nn as nn  
- ​  
+  
  embedding = nn.Embedding(10, 3, padding_idx=5)  
  x = torch.LongTensor([[5, 2, 0, 5]])  
  y = embedding(x)  
@@ -795,11 +817,11 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 ```
  import torch  
  import torch.nn as nn  
- ​  
+  
  padding_idx=2  
  embedding = nn.Embedding(3, 3, padding_idx=padding_idx)  
  print('权重:\n', embedding.weight)  
- ​  
+  
  with torch.no_grad():  
      embedding.weight[padding_idx] = torch.tensor([1.1, 2.2, 3.3])  
  print('权重:\n', embedding.weight)
@@ -1490,7 +1512,7 @@ data = transforms.ToTensor()(data)
  channel_std /= nb_samples  
  print(channel_mean, channel_std)   #结果为tensor([0.0118, 0.0118, 0.0118]) tensor([0.0057, 0.0057, 0.0057])  
 ```
-     ​
+
 
 - 将上述得到的mean和std带入公式，计算输出。
   
