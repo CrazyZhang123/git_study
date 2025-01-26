@@ -84,9 +84,94 @@ git branch 图
 
 ![image-20250120232156046](https://gitee.com/zhang-junjie123/picture/raw/master/image/image-20250120232156046.png)
 
+# Merge使用
 
+## 提取远程仓库
 
-## Merge和rebase区别
+Git 有两个命令用来提取远程仓库的更新。
+
+1、从远程仓库下载新分支与数据：
+
+```
+git fetch
+```
+
+该命令执行完后需要执行 git merge 远程分支到你所在的分支。
+
+2、从远端仓库提取数据并尝试合并到当前分支：
+
+```
+git merge
+```
+
+该命令就是在执行 **git fetch** 之后紧接着执行 **git merge** 远程分支到你所在的任意分支。
+
+![img](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250126095114598.png)
+
+假设你配置好了一个远程仓库，并且你想要提取更新的数据，你可以首先执行 **git fetch [alias]** 告诉 Git 去获取它有你没有的数据，然后你可以执行 **git merge [alias]/[branch]** 以将服务器上的任何更新（假设有人这时候推送到服务器了）合并到你的当前分支。
+
+接下来我们在 Github 上点击" README.md" 并在线修改它:
+
+![img](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250126095129447.jpeg)
+
+然后我们在本地更新修改。
+
+```
+$ git fetch origin
+remote: Counting objects: 3, done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (3/3), done.
+From github.com:tianqixin/runoob-git-test
+   0205aab..febd8ed  master     -> origin/master
+```
+
+以上信息"0205aab..febd8ed master -> origin/master" 说明 master 分支已被更新，我们可以使用以下命令将更新同步到本地：
+
+```
+$ git merge origin/master
+Updating 0205aab..febd8ed
+Fast-forward
+ README.md | 1 +
+ 1 file changed, 1 insertion(+)
+```
+
+查看 README.md 文件内容：
+
+```
+$ cat README.md 
+# 菜鸟教程 Git 测试
+## 第一次修改内容
+```
+
+------
+
+## 推送到远程仓库
+
+推送你的新分支与数据到某个远端仓库命令:
+
+```
+git push [alias] [branch]
+```
+
+以上命令将你的 [branch] 分支推送成为 [alias] 远程仓库上的 [branch] 分支，实例如下。
+
+```
+$ touch runoob-test.txt      # 添加文件
+$ git add runoob-test.txt 
+$ git commit -m "添加到远程"
+master 69e702d] 添加到远程
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 runoob-test.txt
+
+$ git push origin master    # 推送到 Github
+```
+
+重新回到我们的 Github 仓库，可以看到文件已经提交上来了：
+
+![img](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250126095134991.jpeg)
+
+# Merge和rebase区别
 
 > 在 Git 的交汇处，每一次选择都是代码旅程的新起点。
 
