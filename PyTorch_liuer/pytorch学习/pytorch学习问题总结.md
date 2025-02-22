@@ -1,6 +1,6 @@
 ---
 created: 2024-09-30T12:12
-updated: 2025-01-26T00:20
+updated: 2025-02-22T12:31
 ---
 ### 1、torch.nn.Linear()讲解
 
@@ -1113,6 +1113,7 @@ out2: tensor([[ 7,  7,  7],        [21, 21, 21],        [28, 28, 28]])
 
 ### 4.4 三维矩阵相乘
 
+
 对于高于二维的矩阵，第一个矩阵最后一个维度必须和第二个矩阵的倒数第二维度相同。如果是两个三维矩阵相乘，也可以使用torch.bmm()。
 
 ```
@@ -1127,6 +1128,23 @@ print(result.shape)
  #shape: torch.Size([3, 4, 2]) 
 ```
 
+ torch.bmm() 函数定义及参数
+torch.bmm(input, mat2, , out=None) → Tensor
+input (Tensor) – – 第一批要相乘的矩阵
+** mat2* (Tensor) – – 第二批要相乘的矩阵
+不支持广播到通用形状、类型推广以及整数、浮点和复杂输入。
+
+2.2 torch.bmm() 官方示例
+```python
+input = torch.randn(10, 3, 4)
+mat2 = torch.randn(10, 4, 5)
+res = torch.bmm(input, mat2)
+res.size()
+
+torch.Size([10, 3, 5])
+```
+
+全称为batch matrix-matrix product，对输入的张量做矩阵乘法运算，[输入输出](https://so.csdn.net/so/search?q=%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA&spm=1001.2101.3001.7020)维度**一定**是3维；
 
 
 ## 五、torch.mv()矩阵向量乘法函数
