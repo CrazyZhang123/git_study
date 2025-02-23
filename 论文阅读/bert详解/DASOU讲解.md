@@ -1,6 +1,6 @@
 ---
 created: 2025-01-17T21:56
-updated: 2025-01-24T00:14
+updated: 2025-02-22T12:31
 ---
 【BERT从零详细解读，看不懂来打我】 https://www.bilibili.com/video/BV1Ey4y1874y/?share_source=copy_web&vd_source=237c1070b237a59068e4928b71e5140e
 
