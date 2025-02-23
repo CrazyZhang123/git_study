@@ -43,6 +43,10 @@ updated: 2024-09-30T18:45
 
 [交叉熵及实现讲解](https://zhuanlan.zhihu.com/p/98785902?ivk_sa=1024320u)
 
+[Pytorch常用的交叉熵损失函数CrossEntropyLoss()详解](../其他资料/Pytorch常用的交叉熵损失函数CrossEntropyLoss()详解.md)
+
+softmax的目的是归一化，并且使得相加和为1.
+
 ##### Mini-Batch 公式
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20240930183830.png)
 
