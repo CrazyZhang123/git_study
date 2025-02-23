@@ -84,7 +84,87 @@ git branch 图
 
 ![image-20250120232156046](https://gitee.com/zhang-junjie123/picture/raw/master/image/image-20250120232156046.png)
 
+# Merge使用
 
+git fetch和git pull
+
+前面提到，`git pull` 的过程可以理解为：
+
+```cpp
+git fetch origin master //从远程主机的master分支拉取最新内容 
+git merge FETCH_HEAD    //将拉取下来的最新内容合并到当前所在的分支中
+```
+
+即将远程主机的某个分支的更新取回，并与本地指定的分支合并，完整格式可表示为：
+
+```xml
+$ git pull <远程主机名> <远程分支名>:<本地分支名>
+```
+
+如果远程分支是与当前分支合并，则冒号后面的部分可以省略：
+
+```ruby
+$ git pull origin next
+```
+
+## 我的测试
+
+将main分支fetch到本地，然后合并到redmibook分支，解决冲突，然后完成合并。
+
+### 1、fetch main分支到本地
+
+```
+张俊杰@MI-202411011047 MINGW64 /d/workspace/git_study/git_study (redmiBook)
+$ git fetch origin main
+remote: Enumerating objects: 36, done.
+remote: Counting objects: 100% (36/36), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 23 (delta 15), reused 23 (delta 15), pack-reused 0 (from 0)
+Unpacking objects: 100% (23/23), 18.39 KiB | 254.00 KiB/s, done.
+From github.com:CrazyZhang123/git_study
+ * branch            main       -> FETCH_HEAD
+   c8f17e6..ac3df2d  main       -> origin/main
+```
+
+### 2、将FETCH_HEAD分支合并到 redmiBook
+
+也可以 git merge origin/main,从上面输出可以看到
+
+```
+张俊杰@MI-202411011047 MINGW64 /d/workspace/git_study/git_study (redmiBook)
+$ git merge FETCH_HEAD
+Auto-merging Rebase合并.md
+CONFLICT (content): Merge conflict in Rebase合并.md
+Auto-merging TRM.ipynb
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+
+
+## 推送到远程仓库
+
+推送你的新分支与数据到某个远端仓库命令:
+
+```
+git push [alias] [branch]
+```
+
+以上命令将你的 [branch] 分支推送成为 [alias] 远程仓库上的 [branch] 分支，实例如下。
+
+```
+$ touch runoob-test.txt      # 添加文件
+$ git add runoob-test.txt 
+$ git commit -m "添加到远程"
+master 69e702d] 添加到远程
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 runoob-test.txt
+
+$ git push origin master    # 推送到 Github
+```
+
+重新回到我们的 Github 仓库，可以看到文件已经提交上来了：
+
+![img](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250126095134991.jpeg)
 
 # Merge和rebase区别
 
@@ -108,8 +188,6 @@ Merge的原理很简单，就是**将要合并分支的最新提交组合成一�
 
 现在你想要把 main 分支 merge 到你的 feature 分支上去，那么 git 会把两个分支的最新提交4和5合并成一个提交，并且合入目标分支 feature，也就是：
 
-// **main分支合并到feature分支**
-
 ```bash
 git checkout feature
 git merge main
@@ -128,8 +206,6 @@ git merge main
 ### Rebase | 提交历史的线性编织
 
 [rebase](https://zhida.zhihu.com/search?content_id=240694154&content_type=Article&match_order=1&q=rebase&zhida_source=entity) 的使用方式与 merge 类似：
-
-**让现在的 feature 分支基于最新的 main 分支进行变基**（创建副本并且移动到末尾）  
 
 ```bash
 git checkout feature
