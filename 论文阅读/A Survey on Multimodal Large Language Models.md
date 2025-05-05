@@ -582,4 +582,44 @@ CHAIR [160] is an early metric that evaluates hallucination levels in open-ended
 
 Different from previous approaches that use matching mechanisms to detect and decide hallucinations, HaELM [161] proposes using text-only LLMs as a judge to automatically decide whether MLLMs’ captions are correct against reference captions. In light of the fact that text-only LLMs can only access limited image context and require reference annotations, Woodpecker [77] uses GPT-4V to directly assess model responses grounded in the image. FaithScore [162] is a more fine-grained metric based on a routine that breaks down descriptive sub-sentences and evaluates each sub-sentence separately. Based on previous studies, AMBER [163] is an LLM-free benchmark that encompasses both discriminative tasks and generative tasks and involves three types of possible hallucinations (see §6.1).
 
-与以往使用匹配机制来检测和判定幻觉的方法不同，HaELM[161]提出**使用仅处理文本的大语言模型（LLMs）作为评判者，依据参考描述自动判定多模态大语言模型（MLLMs）生成的图像描述是否正确**。鉴于仅处理文本的大语言模型只能获取有限的图像上下文信息且需要参考注释，Woodpecker[77]使用GPT-4V来直接评估基于图像生成的模型回复。FaithScore[162]是一种更细粒度的衡量指标，它基于一种常规方法，即将描述性子句进行拆解，并分别对每个子句进行评估。在先前研究的基础上，AMBER[163]是一个无需大语言模型的基准测试，它涵盖了判别性任务和生成性任务，并且涉及三种可能的幻觉类型（详见6.1节）。 
+与以往使用匹配机制来检测和判定幻觉的方法不同，HaELM[161]提出**使用仅处理文本的大语言模型（LLMs）作为评判者，依据参考描述自动判定多模态大语言模型（MLLMs）生成的图像描述是否正确**。鉴于仅处理文本的大语言模型只能获取有限的图像上下文信息且需要参考注释，Woodpecker[77]使用**GPT-4V来直接评估基于图像生成的模型回复。**FaithScore[162]是一种更细粒度的衡量指标，它基于一种常规方法，即将描述性子句进行拆解，并分别对每个子句进行评估。在先前研究的基础上，AMBER[163]是一个无需大语言模型的基准测试，它涵盖了判别性任务和生成性任务，并且涉及三种可能的幻觉类型（详见6.1节）。 
+
+### 6.3 Mitigation Methods
+
+6.3 缓解（多模态幻觉）的方法 
+
+According to high-level ideas, the current methods can be roughly divided into three categories: 
+
+**pre-correction,** in- process-correction, and post-correction. Pre-correction. An intuitive and straightforward solution for hallucination is to collect specialized data (e.g. negative data) and use the data for fine-tuning, thus resulting in models with fewer hallucinated responses. LRV-Instruction [164] introduces a visual instruction tun- ing dataset. Apart from common positive instructions, the dataset incorporates delicately designed negative instruc- tions at different semantic levels to encourage responses faithful to the image content. LLaVA-RLHF [112] collects human-preference pairs and finetunes models with rein- forcement learning techniques, leading to models more aligned with less hallucinated answers.
+
+根据一些高层次的思路，目前的方法大致可以分为三类：==预校正、过程中校正和后校正。==
+
+**预校正**：针对幻觉问题，==一种直观且直接的解决方案是收集专门的数据（例如负样本数据），并使用这些数据进行微调==，从而使模型生成的带有幻觉的回复更少。 LRV-Instruction[164]引入了一个视觉指令微调数据集。除了常见的正样本指令外，该数据集还纳入了在不同语义层面精心设计的负样本指令，以促使模型生成忠实于图像内容的回复。LLaVA-RLHF[112]收集了人类偏好的样本对，并使用强化学习技术对模型进行微调，使得模型生成的回复更符合要求且幻觉更少。
+
+ **In-process-correction.** Another line is to make improve- ments in architectural design or feature representation. These works try to explore the reasons for hallucinations and design corresponding remedies to mitigate them in the generation process. HallE-Switch [159] performs an empirical analysis of possible factors of object existence hallucinations and hy- pothesizes that existence hallucinations derive from objects not grounded by visual encoders, and they are actually inferred based on knowledge embedded in the LLM. Based on the assumption, a continuous controlling factor and corresponding training scheme are introduced to control the extent of imagination in model output during inference. 
+
+VCD [165] suggests that object hallucinations derive from two primary causes, i.e. statistical bias in training corpus and strong language prior embedded in LLMs. The authors take notice of the phenomenon that when injecting noise into the image, MLLMs tend to lean towards language prior rather than the image content for response genera- tion, leading to hallucinations. Correspondingly, this work designs an amplify-then-contrast decoding scheme to offset the false bias.
+
+ HACL [166] investigates the embedding space of vision and language. Based on the observation, a contrastive learn- ing scheme is devised to pull paired cross-modal repre- sentation closer while pushing away non-hallucinated and hallucinated text representation. 
+
+ **过程中校正**：另一个方向是在架构设计或特征表示方面进行改进。==这些研究试图探究产生幻觉的原因，并设计相应的补救措施，以便在生成过程中减轻幻觉==。 HallE-Switch[159]对物体存在性幻觉的可能因素进行了实证分析，并假设存在性幻觉源于未被视觉编码器定位的物体，而这些物体实际上是基于大语言模型（LLM）中嵌入的知识推断出来的。基于这一假设，引入了一个连续控制因子和相应的训练方案，以便在推理过程中控制模型输出中想象的程度。 
+
+VCD[165]指出，物体幻觉主要由两个原因导致，即训练语料库中的统计偏差以及大语言模型中嵌入的较强语言先验知识。作者注意到这样一个现象：当向图像中注入噪声时，多模态大语言模型（MLLMs）在生成回复时往往更倾向于依赖语言先验知识，而非图像内容，从而导致幻觉产生。相应地，这项研究设计了一种先放大再对比的解码方案，以抵消这种错误偏差。
+
+HACL[166]研究了视觉和语言的嵌入空间。基于观察结果，设计了一种对比学习方案，使成对的跨模态表示更接近，同时使非幻觉和幻觉的文本表示远离。 
+
+**Post-correction.** Different from previous paradigms, post- correction mitigates hallucinations in a post-remedy way and corrects hallucinations after output generation. Wood- pecker [77] is a training-free general framework for hal- lucination correction. Specifically, the method incorporates expert models to supplement contextual information of the image and crafts a pipeline to correct hallucinations step by step. The method is interpretable in that intermediate results of each step can be checked, and objects are grounded in the image. The other method LURE [167] trains a specialized revisor to mask objects with high uncertainty in the descrip- tions and regenerates the responses again
+
+**后校正**：与之前的范式不同，后校正以事后补救的方式减轻幻觉，并在输出生成后纠正幻觉。Woodpecker[77]是一个==无需训练的通用幻觉校正框架。具体来说，该方法纳入了专家模型来补充图像的上下文信息，并设计了一个流程来逐步校正幻觉==。这种方法具有可解释性，因为可以检查每个步骤的中间结果，并且物体能够在图像中被定位。另一种方法LURE[167]训练了一个专门的修正器，用于屏蔽描述中具有高不确定性的物体，并重新生成回复。 
+
+## 7 EXTENDED TECHNIQUES
+
+\7. 扩展技术
+
+ICL is one of the important emergent abilities of LLMs. There are two good traits of ICL: (1) Different from traditional supervised learning paradigms that learn implicit patterns from abundant data, the crux of ICL is to learn from analogy [168]. Specifically, in the ICL setting, LLMs learn from a few examples along with an optional instruction and extrapolate to new questions, thereby solving complex and unseen tasks in a few-shot manner [22], [169], [170]. (2) ICL is usually implemented in a training-free manner [168] and thus can be flexibly integrated into different frameworks at the inference stage. A closely related technique to ICL is instruction-tuning (see §3.2), which is shown empirically to enhance the ICL ability [19]. 
+
+**上下文学习（ICL）是大语言模型（LLMs）重要的涌现能力之一。**上下文学习有两个显著优点：（1）==与传统的监督学习范式不同，传统监督学习是从大量数据中学习隐含模式，而上下文学习的关键在于通过类比进行学习[168]。具体而言，在上下文学习的设定中，大语言模型从少量示例以及可选的指令中学习，并将所学知识推广到新的问题上，从而以少样本的方式解决复杂且从未见过的任务==[22]、[169]、[170]。（2）上下文学习通常以无需训练的方式实现[168]，因此可以在推理阶段灵活地集成到不同的框架中。与上下文学习密切相关的技术是指令微调（见3.2节），实证研究表明指令微调可以增强上下文学习的能力[19]。
+
+In the context of MLLM, ICL has been extended to more modalities, leading to Multimodal ICL (M-ICL). Building upon the setting in (§3.2), at inference time, M-ICL can be implemented by adding a demonstration set, i.e. a set of in-context samples, to the original sample. In this case, the template can be extended as illustrated in Table 9. Note that we list two in-context examples for illustration, but the number and the ordering of examples can be flexibly adjusted. In fact, models are commonly sensitive to the arrangement of demonstrations [168], [171].
+
+ 在多模态大语言模型（MLLM）的背景下，上下文学习已被扩展到更多的模态，从而产生了多模态上下文学习（M-ICL）。基于（3.2节）中的设定，在推理阶段，多模态上下文学习可以通过向原始样本添加一个示例集（即一组上下文样本）来实现。在这种情况下，模板可以像表9所示的那样进行扩展。请注意，我们列出了两个上下文示例用于说明，但示例的数量和顺序可以灵活调整。实际上，模型通常对示例的排列顺序很敏感[168]、[171]。 
