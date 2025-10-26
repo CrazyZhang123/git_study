@@ -11,10 +11,10 @@ RNN 适用于处理序列数据，比如天气数据，自然语言(我爱中国
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006215517.png)
 
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006215634.png)
-- 循环神经网络RNN 通常用tanh
+- 循环神经网络RNN 通常用**tanh**
 - RNN Cell 实际只做了一次线性层
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006220112.png)
-- h和x都要进行 线性运算，但是权重不同。
+- ==h和x都要进行 线性运算，但是权重不同。==
 
 #### RNN Cell in PyTorch
 - 通过上面的示意图，可以看到，内部的权重维度需要 input_size 和 hidden_size来确定所有的W,输出的维度也是一样，因此参数就是这两个。
@@ -29,9 +29,9 @@ RNN 适用于处理序列数据，比如天气数据，自然语言(我爱中国
 ![image.png|517](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241007124200.png)
 在PyTorch中，处理序列数据时，数据的维度通常遵循`(seq_len, batch_size, *)`的格式，其中`seq_len`是序列的长度，`batch_size`是批处理大小，`*`表示其他可能的维度（如`input_size`表示输入特征的维度）。这种格式允许PyTorch高效地处理批量序列数据。
 
-然而，当你使用`torch.nn.RNNCell`时，需要注意一点：`RNNCell`是处理单个时间步的RNN单元。这意味着你需要为每个时间步单独调用`RNNCell`，并传递当前时间步的输入和上一个时间步的隐藏状态。
+==然而，当你使用`torch.nn.RNNCell`时，需要注意一点：`RNNCell`是处理单个时间步的RNN单元。这意味着你需要为每个时间步单独调用`RNNCell`，并传递当前时间步的输入和上一个时间步的隐藏状态。==
 
-在你的例子中，`dataset`被设置为三维张量`(seq_len, batch_size, input_size)`，这是因为你可能原本打算使用`torch.nn.RNN`（它接受这种维度的输入）而不是`torch.nn.RNNCell`。`torch.nn.RNN`可以一次性处理整个序列，而`torch.nn.RNNCell`则需要你手动迭代序列的每个时间步。
+在你的例子中，`dataset`被设置为三维张量`(seq_len, batch_size, input_size)`，这是因为你可能原本打算使用`torch.nn.RNN`（它接受这种维度的输入）而不是`torch.nn.RNNCell`。==`torch.nn.RNN`可以一次性处理整个序列，而`torch.nn.RNNCell`则需要你手动迭代序列的每个时间步。==
 
 为了与`RNNCell`兼容，你需要在循环中迭代`dataset`的每个时间步，并将每个时间步的输入（形状为`(batch_size, input_size)`）传递给`RNNCell`。你的代码已经正确地做到了这一点，通过`enumerate(dataset)`来迭代`dataset`，并在每次迭代中取出当前时间步的输入`input_`（注意，这里`input_`的形状实际上是`(batch_size, input_size)`，因为`dataset`是一个三维张量，当你通过索引访问它时，它会返回一个减少了一个维度的张量）。
 
@@ -70,6 +70,9 @@ numLayers解释
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006233523.png)
 labels 维度应该是 (seqLen , 1)
 
+这里是==1-gram方法==，只用一个词预测下一个词，所以seqLen中每一个seq拥有一个batchsize也就是1的batch，来计算损失。
+**交叉熵损失的核心是 “输入是类别概率分布（对数 ），目标是类别索引”**，维度必须严格对齐 `(batch_size, num_classes)` 和 `(batch_size)` 。
+![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006233717.png)
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006233717.png)
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006233823.png)
 
@@ -82,12 +85,13 @@ labels 维度应该是 (seqLen , 1)
 
 
 #### Example RNN Module
+![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006234743.png)
 ![](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006234343.png)
 
 
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006234654.png)
 
-![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241006234743.png)
+
 
 ##### Result 
 

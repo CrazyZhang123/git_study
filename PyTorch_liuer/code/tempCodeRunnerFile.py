@@ -1,0 +1,1 @@
+vectorized_loss = np.vectorize(lambda w, b: sum_loss_fn(x_data, y_data, w, b))
