@@ -62,6 +62,7 @@ model_outputs.iloc[0:1].to_csv('./_outputs_seed42_n100_test.csv', index=False)
 ```
 
 
+<<<<<<< HEAD
 # 4、df.groupby
 ### 🧠 背景
 
@@ -257,3 +258,5 @@ df.to_dict('records', into=dd)
 | 分离索引、列名、数据      | `'split'`          |
 | 保留完整元信息（含名称）  | `'tight'`          |
 | 按行名（索引）获取数据    | `'index'`          |
+=======
+>>>>>>> 4978d2d (2025-10-26 update)

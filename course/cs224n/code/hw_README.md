@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 https://github.com/PKUFlyingPig/CS224n/tree/master/hw
 
 
@@ -50,3 +51,6 @@ u_{on} & u_{on} & \dots & u_{on}
 $$
 
 这种结构可以理解为“将列向量 $ u_o $ 横向复制 $ n $ 次”，而非严格的矩阵乘法，之前的表述是为了方便理解而做的简化，特此修正。
+=======
+https://github.com/PKUFlyingPig/CS224n/tree/master/hw
+>>>>>>> 4978d2d (2025-10-26 update)

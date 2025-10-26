@@ -1,11 +1,15 @@
 ---
 created: 2024-09-30T12:12
-updated: 2024-12-22T16:33
+updated: 2025-02-22T12:31
 ---
+# 特殊约束
+
+1. **PyTorch 设计约束**： RNN 相关的 `pack_padded_sequence` 函数内部会对长度张量进行 CPU 端的操作，不支持 GPU 张量作为输入。
+
 ### 1、torch.nn.Linear()讲解
 
 ^a35883
-nn.Linear 是 PyTorch 框架中的一个模块，用于实现线性层，也就是全连接层。线性层是神经网络中的基本构件，它执行一个基于矩阵乘法的线性变换，通常用于将输入数据转换为输出数据。
+nn.Linear 是 PyTorch 框架中的一个模块，用于实现线性层，也就是全连接层。线性层是神经网络中的基本构件，它执行一个基于矩阵乘法的线性变换，通常用于将输入数据转换为输出数据。 ^befafd
 
 参数介绍：
 
@@ -40,12 +44,12 @@ print("Output shape:", output.shape)
 可以看到[2,3,4,4]维度的数据经过`nn.Linear得到了`[2,3,4,5]的数据，确实可以计算多维度。
 首先通过公式可以看到nn.Linear是通过一个权重矩阵来实现维度的变化的。x是输入，A是权重矩阵，x与经过转置的权重矩阵A进行矩阵乘法，最后加上偏置项。
 其次nn.Linear的输入是不限制维度的，可以看到括号中的*，其中 * 表示任意数量的附加维度，包括为空（即常见的数据拉平后只剩一个维度）。
-权重矩阵维度为（out,in）,但是nn.Linear函数的用法是nn.Linear(in,out)。
-最终输出的结果是（*,out）。
+==权重矩阵维度为（out,in）,但是nn.Linear函数的用法是nn.Linear(in,out)。
+最终输出的结果是（*,out）。==
 
 我画了个计算维度变换图，如下：
 
-![image.png|504](https://gitee.com/zhang-junjie123/picture/raw/master/image/20241123160008.png)
+<img src="https://gitee.com/zhang-junjie123/picture/raw/master/image/20241123160008.png" alt="啊、" style="zoom:67%;" />
 
 
 
@@ -88,11 +92,39 @@ y = xA^T + b
 
 ### 2、Tensor常见方法
 
-.item ()  
-把 tensor 转为 python 的 float 类型
+- `.item() `
+用于从单元素张量tensor转为 python 的 float 类型
 
-.numpy ()  
-将张量转换为与其共享底层存储的 n 维 numpy 数组
+- `.numpy ()`  
+将张量tensor转换为与其共享底层存储的 n 维 numpy 数组
+
+- `.detach()`
+PyTorch中的tensor .detach（）方法通过返回一个不需要梯度的新张量来将张量从计算图中分离出来。如果我们想将张量从图形处理单元（GPU）移动到中央处理单元（CPU），那么我们可以使用detach（）方法。它将不接受任何参数并返回分离的张量。
+
+- `numel()` 是 PyTorch Tensor 的方法，意思是 "**number of elements**" —— 返回张量中元素的总个数。
+
+example:
+```python
+# import the  torch module
+import torch
+
+# create one dimensional tensor with 5 elements with requires_grad
+# parameter that sets to True
+tensor1 = torch.tensor([7.8, 3.2, 4.4, 4.3, 3.3], requires_grad=True)
+print(tensor1)
+
+# detach the tensor
+print(tensor1.detach())
+```
+**Output:**
+```
+tensor([7.8000, 3.2000, 4.4000, 4.3000, 3.3000], requires_grad=True)
+
+tensor([7.8000, 3.2000, 4.4000, 4.3000, 3.3000])
+```
+
+
+`.data` 是一个属性，用于获取张量的底层数据。它返回一个新的张量，该张量与原始张量共享相同的数据，但不会跟踪梯度。
 
 对Tensor维度的理解：
 ```python
@@ -112,9 +144,73 @@ tensor([[0.],
 
 ```
 
+
+#### (1)创建tensor
+
+torch.tensor(_data_, _*_, _dtype=None_, _device=None_, _requires_grad=False_, _pin_memory=False_) → [Tensor](https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor "torch.Tensor")
+
+Torch 定义了以下数据类型的张量类型
+
+| 数据类型                                                                  | dtype                                                                               |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| 32 位浮点数                                                               | `torch.float32` 或 `torch.float`                                                     |
+| 64 位浮点数                                                               | `torch.float64` 或 `torch.double`                                                    |
+| 16 位浮点数 [1](https://docs.pytorch.ac.cn/docs/stable/tensors.html#id9)  | `torch.float16` 或 `torch.half`                                                      |
+| 16 位浮点数 [2](https://docs.pytorch.ac.cn/docs/stable/tensors.html#id10) | `torch.bfloat16`                                                                    |
+| 8 位整数 (无符号)                                                           | `torch.uint8`                                                                       |
+| 16 位整数 (无符号)                                                          | `torch.uint16` (有限支持) [4](https://docs.pytorch.ac.cn/docs/stable/tensors.html#id12) |
+| 32 位整数 (无符号)                                                          | `torch.uint32` (有限支持) [4](https://docs.pytorch.ac.cn/docs/stable/tensors.html#id12) |
+| 64 位整数 (无符号)                                                          | `torch.uint64` (有限支持) [4](https://docs.pytorch.ac.cn/docs/stable/tensors.html#id12) |
+| 8 位整数 (有符号)                                                           | `torch.int8`                                                                        |
+| 16 位整数 (有符号)                                                          | `torch.int16` 或 `torch.short`                                                       |
+| 32 位整数 (有符号)                                                          | `torch.int32` 或 `torch.int`                                                         |
+| 64 位整数 (有符号)                                                          | `torch.int64` 或 `torch.long`                                                        |
+| 布尔                                                                    | `torch.bool`                                                                        |
+| 量化 8 位整数 (无符号)                                                        | `torch.quint8`                                                                      |
+| 量化 8 位整数 (有符号)                                                        | `torch.qint8`                                                                       |
+
+
+
+#### (2)索引中的-1和\[-1\]
+在PyTorch和NumPy中，这两种索引方式有重要区别：
+
+1. `xy.values[:,-1]`（使用-1）
+
+- **返回一维数组**：结果形状为 `(N,)`，其中N是行数
+- **去掉了维度信息**：从二维数组变成了1维数组
+- **示例**：如果原始数据是 (759, 9) 的数组，结果会是 (759,) 的1维数组
+
+2. `xy.values[:,[-1]]`（使用\[-1]）
+
+- **返回二维数组**：结果形状为 `(N, 1)`，保持了维度
+- **保留了列维度**：仍然是2维数组，只是列数为1
+- **示例**：如果原始数据是 (759, 9) 的数组，结果会是 (759, 1) 的2维数组
+
+**实际影响**
+
+在PyTorch中，这种区别很重要：
+
+```python
+# 假设 xy.values 形状为 (759, 9)
+print(xy.values[:,-1].shape)     # 输出: (759,)
+print(xy.values[:,[-1]].shape)  # 输出: (759, 1)
+```
+
 ### 3、torch.max,full,ones,zeros
 #### 一、一个参数时的 [torch](https://so.csdn.net/so/search?q=torch&spm=1001.2101.3001.7020).max()
 返回Tensor的最大值
+
+示例
+
+```
+# data.max(2) 方法沿着第三个维度（即词汇表维度）找到最大值。max(2) 返回两个张量：
+# 最大值和最大值的索引。通过 [1] 选择最大值的索引，然后通过 [0] 选择第一个批次的结果。
+# 最后，使用 data.numpy() 将结果转换为 NumPy 数组。
+logits_lm = logits_lm.data.max(2)[1][0].data.numpy()
+# -- from BERT.ipynb
+```
+
+
 
 #### 二、增加指定维度时的 torch.max()
 
@@ -152,6 +248,16 @@ torch.return_types.max(
 values=tensor([0.6035, 2.0575, 1.0107, 0.7016]),
 indices=tensor([3, 2, 0, 2]))
 ```
+#### 理解dim
+
+[[【PyTorch】PyTorch 中的 dim]]
+
+dim如果是**最后一个维度**，可以拆成这样理解，求完最后一个维度的最大值，这个维度就消失了，按下图的结果维度应该是
+
+从[2,3,4]变为了[2,3]。
+
+<img src="https://gitee.com/zhang-junjie123/picture/raw/master/image/20250126162039523.png" alt="在这里插入图片描述" style="zoom: 80%;" />
+
 #### 三、两个输入张量时的 torch.max()
 
 ###### 1. 函数介绍
@@ -635,16 +741,16 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 ```python
  import torch  
  import numpy as np  
- ​  
+   
  batch_size=3  
  seq_length=4  
- ​  
+ 
  input_data=np.random.uniform(0,19,size=(batch_size,seq_length))#shape(3,4)  
- ​  
+   
  input_data=torch.from_numpy(input_data).long()   
- ​  
+   
  embedding_layer=torch.nn.Embedding(vocab_size,embedding_dim)   
- ​  
+ 
  lstm_input=embedding_layer(input_data)#shape(3,4,6)
 ```
 
@@ -656,7 +762,7 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 
 #### （1）[词嵌入](https://so.csdn.net/so/search?q=%E8%AF%8D%E5%B5%8C%E5%85%A5&spm=1001.2101.3001.7020)简介
 
-  关于词嵌入，[这篇文章](https://blog.csdn.net/qq_41477675/article/details/114645012)讲的挺清楚的，相比于One-hot编码，Embedding方式更方便计算，例如在“就在江湖之上”整个词典中，要编码“江湖”两个字，One-hot编码需要 [ l e n g t h , w o r d _ c o u n t ] {[length, word\_count]} [length,word_count] 大小的张量，其中 w o r d _ c o u n t {word\_count} word_count 为词典中所有词的总数，而Embedding方式的嵌入维度 e m b e d d i n g _ d i m {embedding\_dim} embedding_dim 可远远小于 w o r d _ c o u n t {word\_count} word_count 。在运用Embedding方式编码的词典时，只需要词的索引，下图例子中： “江湖”——>[2, 3]
+  关于词嵌入，[这篇文章](https://blog.csdn.net/qq_41477675/article/details/114645012)讲的挺清楚的，相比于One-hot编码，Embedding方式更方便计算，例如在“就在江湖之上”整个词典中，要编码“江湖”两个字，One-hot编码需要大小的张量，其中${word\_count} $为词典中所有词的总数，而Embedding方式的嵌入维度${embedding\_dim} $ 可远远小于 ${word\_count} $。在运用Embedding方式编码的词典时，只需要词的索引，下图例子中： “江湖”——>[2, 3]
 
 ![在这里插入图片描述](https://gitee.com/zhang-junjie123/picture/raw/master/image/f1137cd85b74b625b73005c4684b7a60.png)
 
@@ -672,7 +778,7 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 
   **③ padding_idx (int, optional)：** 填充索引，在padding_idx处的嵌入向量在训练过程中没有更新，即它是一个固定的“pad”。对于新构造的Embedding，在padding_idx处的嵌入向量将默认为全零，但可以更新为另一个值以用作填充向量。
 
-输入： I n p u t ( ∗ ) {Input(∗)} Input(∗): IntTensor 或者 LongTensor，为任意size的张量，包含要提取的所有词索引。 输出： O u t p u t ( ∗ , H ) {Output(∗, H)} Output(∗,H): ∗ {∗} ∗ 为输入张量的size， H {H} H = embedding_dim
+输入：$ {Input(∗)} $: IntTensor 或者 LongTensor，为任意size的张量，包含要提取的所有词索引。 输出： ${Output(∗, H)} $: $ {∗} $ 为输入张量的size， ${H} $ = embedding_dim
 
 ### 2. torch.nn.Embedding用法
 
@@ -683,15 +789,15 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 ```
  import torch  
  import torch.nn as nn  
- ​  
+  
  embedding = nn.Embedding(10, 3)  
- x = torch.LongTensor([[1, 2, 4, 5], [4, 3, 2, 9]])  
- ​  
+ x = torch.LongTensor([[1, 2, 4, 5], [4, 3, 2, 9]])  # (2,4)
+  
  y = embedding(x)  
- ​  
+  
  print('权重:\n', embedding.weight)  
  print('输出:')  
- print(y)
+ print(y) # 维度 (2,)
 ```
 
 查看权重与输出，打印如下：
@@ -716,7 +822,7 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
           [-0.0315, -1.2234, -0.4589],  
           [-1.0621, -0.1466,  1.7412],  
           [ 1.0708, -0.7888, -0.0177]],  
- ​  
+  
          [[-1.0621, -0.1466,  1.7412],  
           [ 0.6131, -0.4381,  0.1253],  
           [-0.0315, -1.2234, -0.4589],  
@@ -736,7 +842,7 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 
  import torch  
  import torch.nn as nn  
- ​  
+  
  weight = torch.FloatTensor([[1, 2.3, 3], [4, 5.1, 6.3]])  
  embedding = nn.Embedding.from_pretrained(weight)  
  x = torch.LongTensor([1, 0, 0])  
@@ -759,7 +865,7 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 ```
  import torch  
  import torch.nn as nn  
- ​  
+  
  embedding = nn.Embedding(10, 3, padding_idx=5)  
  x = torch.LongTensor([[5, 2, 0, 5]])  
  y = embedding(x)  
@@ -795,11 +901,11 @@ embedding翻译word是这样操作的，首先，先准备一本词典，这个�
 ```
  import torch  
  import torch.nn as nn  
- ​  
+  
  padding_idx=2  
  embedding = nn.Embedding(3, 3, padding_idx=padding_idx)  
  print('权重:\n', embedding.weight)  
- ​  
+  
  with torch.no_grad():  
      embedding.weight[padding_idx] = torch.tensor([1.1, 2.2, 3.3])  
  print('权重:\n', embedding.weight)
@@ -873,7 +979,7 @@ tensor = torch.FloatTensor([[1, 2, 4, 1],
 # 13、分布
 ## 1、xavier分布
 其目的是使得每层网络的输入和输出的方差保持一致，从而有效地避免梯度消失或爆炸问题。
-
+[[pytorch学习：xavier分布和kaiming分布]]
 ## 2、kaiming 分布
 [[pytorch学习：xavier分布和kaiming分布]]
 
@@ -1040,7 +1146,8 @@ out1 = torch.matmul(x,y)  
 
 向量与矩阵做矩阵乘法运算时，需对向量进行增维操作，将其变成2维矩阵，矩阵相乘结束后，结果中增加的维度需要被删除。
 
-1）向量![a\in R^{m}](https://latex.csdn.net/eq?a%5Cin%20R%5E%7Bm%7D)与矩阵![B\in R^{m*n}](https://latex.csdn.net/eq?B%5Cin%20R%5E%7Bm*n%7D)相乘，需先将向量变成矩阵![A\in R^{1*m}](https://latex.csdn.net/eq?A%5Cin%20R%5E%7B1*m%7D)，矩阵乘法维度变化：(1×m)×(m×n)->(1×n)，乘法运算结果矩阵![R^{1*n}](https://latex.csdn.net/eq?R%5E%7B1*n%7D)需删除新增维度，删除后的结果变成长度为n的1维向量![R^{n}](https://latex.csdn.net/eq?R%5E%7Bn%7D)。
+
+1）向量$a\in R^{m}$与矩阵$B\in R^{m*n}$相乘，需先将向量变成矩阵$A\in R^{1*m}$，矩阵乘法维度变化：(1×m)×(m×n)->(1×n)，乘法运算结果矩阵$R^{1*n}$需删除新增维度，删除后的结果变成长度为n的1维向量$R^{n}$。
 
 ```
  x = torch.tensor([2,3])
@@ -1090,6 +1197,7 @@ out2: tensor([[ 7,  7,  7],        [21, 21, 21],        [28, 28, 28]])
 
 ### 4.4 三维矩阵相乘
 
+
 对于高于二维的矩阵，第一个矩阵最后一个维度必须和第二个矩阵的倒数第二维度相同。如果是两个三维矩阵相乘，也可以使用torch.bmm()。
 
 ```
@@ -1104,6 +1212,23 @@ print(result.shape)
  #shape: torch.Size([3, 4, 2]) 
 ```
 
+ torch.bmm() 函数定义及参数
+torch.bmm(input, mat2, , out=None) → Tensor
+input (Tensor) – – 第一批要相乘的矩阵
+** mat2* (Tensor) – – 第二批要相乘的矩阵
+不支持广播到通用形状、类型推广以及整数、浮点和复杂输入。
+
+2.2 torch.bmm() 官方示例
+```python
+input = torch.randn(10, 3, 4)
+mat2 = torch.randn(10, 4, 5)
+res = torch.bmm(input, mat2)
+res.size()
+
+torch.Size([10, 3, 5])
+```
+
+全称为batch matrix-matrix product，对输入的张量做矩阵乘法运算，[输入输出](https://so.csdn.net/so/search?q=%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA&spm=1001.2101.3001.7020)维度**一定**是3维；
 
 
 ## 五、torch.mv()矩阵向量乘法函数
@@ -1279,7 +1404,7 @@ print(f"Sample Image Shape: {sample_image.shape}")
 print(f"Sample Label: {sample_label}") 
 # 输出: Sample Label: 3
 ```
- 
+
 在这个例子中，我们创建了一个包含100张图像和对应标签的 ` TensorDataset ` 。通过 ` dataset[0] ` ，我们可以访问第一个样本的图像和标签。
 
 ##### 2. 组合多个特征张量
@@ -1296,7 +1421,7 @@ sample_feature1, sample_feature2 = dataset[0]
 print(f"Sample Feature1 Shape: {sample_feature1.shape}")  # 输出: Sample Feature1 Shape: torch.Size([50])
 print(f"Sample Feature2 Shape: {sample_feature2.shape}")  # 输出: Sample Feature2 Shape: torch.Size([30])
 ```
- 
+
 在这个例子中，我们创建了一个包含两个特征张量的 ` TensorDataset ` ，并通过 ` dataset[0] ` 访问第一个样本的两个特征。
 #### DataLoader 详解
 
@@ -1304,7 +1429,7 @@ print(f"Sample Feature2 Shape: {sample_feature2.shape}")  # 输出: Sample Featu
 ##### 1. [批量处理](https://edu.csdn.net/cloud/ml_summit?utm_source=glcblog&amp;spm=1001.2101.3001.7020 )数据
  ` DataLoader ` 可以将数据集划分为多个批次（batch），便于[模型训练](https://edu.csdn.net/cloud/ml_summit?utm_source=glcblog&amp;spm=1001.2101.3001.7020 )。
 
- 
+
 ```python
 from torch.utils.data import DataLoader 
 # 创建 DataLoader
@@ -1316,11 +1441,11 @@ for batch_features, batch_labels in train_loader:
 	print(f"Batch Labels Shape: {batch_labels.shape}")  # 输出: Batch Labels Shape: torch.Size([32])    
 	# 这里可以进行训练操作，如前向传播、反向传播等
 ```
- 
+
 在这个例子中， ` train_loader ` 将数据集划分为大小为32的批次。通过遍历 ` train_loader ` ，我们可以轻松地获取每个批次的特征和标签。
 
 ##### 2. 数据打乱
- 
+
  ` DataLoader ` 可以通过设置 ` shuffle=True ` 来在每个 epoch 开始时随机打乱数据，避免模型学习到数据的顺序。
 
 ```python
@@ -1387,11 +1512,11 @@ for epoch in range(2):
 #### 文章目录
 
 - [pytorch中的transforms.ToTensor和transforms.Normalize理解🌴](#pytorchtransformsToTensortransformsNormalize_10)
-    
+  
 - - [transforms.ToTensor🌵](#transformsToTensor_12)
         
     - [transforms.Normalize🌵](#transformsNormalize_75)
-        
+      
 
 
 ### transforms.ToTensor🌵
@@ -1407,16 +1532,16 @@ for epoch in range(2):
   大概的意思就是说，`transforms.ToTensor()`可以将PIL和numpy格式的数据从[0,255]范围转换到[0,1] ，具体做法其实就是将原始数据除以255。另外原始数据的shape是（H x W x C），通过`transforms.ToTensor()`后shape会变为（C x H x W）。这样说我觉得大家应该也是能理解的，这部分并不难，但想着还是用一些例子来加深大家的映像🌽🌽🌽
 
 - 先导入一些包
-    
+  
 ```
  import cv2  
  import numpy as np  
  import torch  
  from torchvision import transforms
 ```
-    
+
 - 定义一个数组[模型](https://edu.csdn.net/cloud/ml_summit?utm_source=glcblog&spm=1001.2101.3001.7020)图片，注意数组数据类型需要时np.uint8【官方图示中给出】
-    
+  
 ```
 data = np.array([  
 			 [[1,1,1],[1,1,1],[1,1,1],[1,1,1],[1,1,1]],  
@@ -1426,17 +1551,17 @@ data = np.array([
 			 [[5,5,5],[5,5,5],[5,5,5],[5,5,5],[5,5,5]]  
 	 ],dtype='uint8')
 ```
-    
+
 这是可以看看data的shape，注意现在为（W H C）。
     
 ![image-20220416120518895](https://gitee.com/zhang-junjie123/picture/raw/master/image/37da4fd4becceba642e1b122a63019cb.png)
     
 - 使用`transforms.ToTensor()`将data进行转换
-    
+  
 ```
 data = transforms.ToTensor()(data)
 ```
-    
+
 这时候我们来看看data中的数据及shape。
     
 ![image-20220416120811156](https://gitee.com/zhang-junjie123/picture/raw/master/image/4d5b0f134386cf8b247a87e76cc569cf.png)
@@ -1468,7 +1593,7 @@ data = transforms.ToTensor()(data)
  读到这里大家是不是以为就完了呢？这里还想和大家唠上一唠🍓🍓🍓上面的两个参数（0.5，0.5，0.5）是怎么得来的呢？这是根据数据集中的数据计算出的均值和标准差，所以往往不同的数据集这两个值是不同的🍏🍏🍏这里再举一个例子帮助大家理解其计算过程。同样采用上文例子中提到的数据。
 
 - 上文已经得到了经ToTensor转换后的数据，现需要求出该数据每个通道的mean和std。【这一部分建议大家自己运行看看每一步的结果🌵🌵🌵】
-    
+  
 ```
  # 需要对数据进行扩维，增加batch维度  
  data = torch.unsqueeze(data,0)    #在pytorch中一般都是（batch,C,H,W）  
@@ -1489,10 +1614,10 @@ data = transforms.ToTensor()(data)
  channel_std /= nb_samples  
  print(channel_mean, channel_std)   #结果为tensor([0.0118, 0.0118, 0.0118]) tensor([0.0057, 0.0057, 0.0057])  
 ```
-     ​
-    
+
+
 - 将上述得到的mean和std带入公式，计算输出。
-    
+  
 ```
  for i in range(3):  
 	 data[i] = (data[i] - channel_mean[i]) / channel_std[i]  
@@ -1528,24 +1653,24 @@ data = transforms.ToTensor()(data)
 - https://zhuanlan.zhihu.com/p/29923090
 
 - https://zhuanlan.zhihu.com/p/65609544
- 
+
 # 20、torch.nn.Parameter()
 
 [[PyTorch中的torch.nn.Parameter() 详解-CSDN博客]]
- 
+
 **简单总结：**
 首先可以把这个函数理解为类型[转换函数](https://edu.csdn.net/cloud/houjie?utm_source=highword&spm=1001.2101.3001.7020)，将一个不可训练的类型`Tensor`转换成可以训练的类型`parameter`并将这个`parameter`绑定到这个`module`里面(`net.parameter()`中就有这个绑定的`parameter`，所以在参数优化的时候可以进行优化的)，所以经过类型转换这个`self.v`变成了[模型](https://edu.csdn.net/cloud/ml_summit?utm_source=glcblog&spm=1001.2101.3001.7020)的一部分，成为了模型中根据训练可以改动的参数了。使用这个函数的目的也是想让某些变量在学习的过程中不断的修改其值以达到最优化。
 
- 
+
 # 21、torch.view和torch.reshape
 [[Pytorch_ view()和reshape()的区别？他们与continues()的关系是什么？]]
 正常用，基本没区别
- 
+
 
 
 # 22、model.apply(fn)或net.apply(fn)
 [[model.apply(fn)或net.apply(fn)-CSDN博客]]
- 
+
 pytorch中的`model.apply(fn)`会递归地将函数`fn`应用到父模块的每个子模块`submodule`，也包括`model`这个父模块自身。 
 fn的参数就是每个模块。
 
@@ -1553,16 +1678,16 @@ fn的参数就是每个模块。
 
 MSE: Mean Squared Error（**均方误差**） 含义：**均方误差**，是预测值与真实值之差的平方和的平均值，即： 
 $$
-\begin{aligned} MSE =\cfrac {1}{N}\sum_{i=1}^n(x_i-y_i)^2 \end{aligned} 
+\begin{aligned} MSE =\cfrac {1}{N}\sum_{i=1}^n(x_i-y_i)^2 \end{aligned}
 $$
 但是，在具体的应用中跟定义稍有不同。主要差别是参数的设置，在[torch](https://so.csdn.net/so/search?q=torch&spm=1001.2101.3001.7020).nn.MSELoss中有一个reduction参数。reduction是维度要不要缩减以及如何缩减主要有三个选项：
 
 - **‘none’**:no reduction will be applied.
-    
+  
 - **‘mean’**: the sum of the output will be divided by the number of elements in the output.
-    
+  
 - **‘sum’**: the output will be summed.
-    
+  
 
   如果不设置reduction参数，**默认是’mean’**。 下面看个例子：
 
@@ -1600,9 +1725,428 @@ $$
 
 本文转自 [https://blog.csdn.net/zfhsfdhdfajhsr/article/details/115637954](https://blog.csdn.net/zfhsfdhdfajhsr/article/details/115637954)，如有侵权，请联系删除。
 
- 
 
-                
+# 24、torch.expand和repeat函数
+[[【Pytorch】对比expand和repeat函数]]
 
-        
+​        
 
+25、随机数相关
+
+一、😅 如何生成随机数？
+-------------
+
+1.  **torch.rand()**
+
+  `torch.rand()`函数用于生成具有**均匀分布**的随机数，这些随机数的范围在\[0, 1)之间。它接受一个形状参数（shape），返回一个指定形状的张量（Tensor）。
+
+示例代码：
+
+```python
+import torch
+
+# 生成一个形状为(3, 4)的张量，元素值在[0, 1)之间
+tensor = torch.rand((3, 4))
+print(tensor)
+```
+
+输出：
+
+```less
+tensor([[0.1490, 0.7928, 0.0411, 0.5075],
+        [0.0754, 0.8043, 0.7533, 0.1298],
+        [0.5087, 0.1185, 0.6706, 0.9509]])
+
+进程已结束,退出代码0
+```
+
+2.  **torch.randn()**
+
+  `torch.randn()`函数用于生成具有**标准正态分布**的随机数，即均值为0，标准差为1的随机数。它同样接受一个形状参数，并返回一个指定形状的张量。
+
+示例代码：
+
+```python
+import torch
+
+# 生成一个形状为(3, 4)的张量，元素值服从标准正态分布
+tensor = torch.randn((3, 4))
+print(tensor)
+print("均值:", tensor.mean().item())
+print("标准差:", tensor.std().item())
+```
+
+输出：
+
+```less
+tensor([[ 1.7490, -0.1910, -0.6926,  0.2398],
+        [ 0.9135, -0.3359,  1.0442,  0.7824],
+        [-0.7138,  0.1682, -1.2245, -0.3747]])
+均值: 0.1137121245265007
+标准差: 0.868906557559967
+
+进程已结束,退出代码0
+```
+
+3.  **torch.randint()**
+
+  `torch.randint()`函数用于生成**指定范围内的整数随机数**。它接受三个参数：low（最小值）、high（最大值）和形状（shape）。返回的张量中的元素值将在\*\*\[low, high)\*\*范围内。
+
+示例代码：
+
+```python
+import torch
+
+# 生成一个形状为(3, 4)的张量，元素值在[0, 10)之间
+tensor = torch.randint(0, 10, (3, 4))
+print(tensor)
+```
+
+输出：
+
+```less
+tensor([[4, 0, 8, 4],
+        [0, 9, 4, 3],
+        [0, 3, 9, 3]])
+
+进程已结束,退出代码0
+```
+
+4.  **torch.randperm()**
+
+  `torch.randperm()`函数用于**生成一个从0到n-1的随机整数排列**。它接受一个参数n，返回一个长度为n的张量，其中包含从0到n-1的随机整数，**每个整数只出现一次**。
+
+示例代码：
+
+```python
+import torch
+
+# 生成一个长度为10的随机整数排列
+tensor = torch.randperm(10)
+print(tensor)
+```
+
+输出：
+
+```less
+tensor([0, 7, 1, 2, 9, 6, 3, 5, 4, 8])
+
+进程已结束,退出代码0
+```
+
+二、🎯 其他注意事项
+-----------
+
+*   在使用随机数函数时，需要注意生成的随机数是否满足你的需求，比如分布类型、范围等。
+*   在进行深度学习实验时，设置随机数种子（random seed）可以帮助我们复现实验结果。可以使用`torch.manual_seed()`函数来设置随机数种子。
+*   生成随机数时，要注意张量的形状和数据类型，确保它们与你的模型和数据相匹配。
+
+
+
+# 25、torch转置函数
+
+[[深度学习/git_study/其他资料/PyTorch 两大转置函数 transpose() 和 permute()]]
+
+
+# 26、torch Conv1d 和 linear
+
+[[PyTorch实现MLP的两种方法，以及nn.Conv1d, kernel]]
+
+# 27、torch.gather函数
+[[图解PyTorch中的torch.gather函数]]
+
+[[【PyTorch】Torch.gather()用法详细图文解释]]
+
+简单理解
+![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250126001452.png)
+
+根据dim来确定index\[i]\[j]\[k]需要替换的input的索引位置和值来取数。
+
+# 28、激活函数
+### 1. GELU 激活函数的定义如下：
+
+$$ \text{GELU}(x) = x \cdot \Phi(x) $$
+
+ 其中，$\Phi(x)$ 是标准正态分布的累积分布函数（CDF），可以近似为：
+
+ $$ \Phi(x) \approx 0.5 \cdot (1 + \text{erf}(\frac{x}{\sqrt{2}})) $$
+
+这里，$\text{erf}(x)$ 是误差函数。
+
+# 29、交叉熵和KL散度
+
+### 交叉熵
+
+交叉熵（Cross Entropy）用于衡量一个概率分布与另一个概率分布之间的距离。
+
+[[交叉熵损失函数（Cross Entropy Loss）：图示+公式+代码]]
+
+==重要==：**pytorch深度学习框架内的函数会将标签值做one_hot处理,之后再进行交叉熵的公式运算.**  
+**因此在使用pytorch框架的时候,标签无须自己做转换.**
+
+[[Pytorch详解NLLLoss和CrossEntropyLoss-CSDN博客]]
+
+### KL散度
+
+KL散度（Kullback-Leibler散度）是一种衡量两个概率分布之间差异性的度量方法。
+
+[[KL 散度（Kullback-Leibler Divergence）：图示+公式+代码]]
+
+[[KLDivLoss — PyTorch 2.8 documentation]]
+
+# 30、stack函数
+
+官方解释：沿着一个新维度对输入张量序列进行连接。 序列中所有的张量都应该为相同形状。
+
+浅显说法：把多个2维的张量凑成一个3维的张量；多个3维的凑成一个4维的张量…以此类推，也就是在**增加新的维度进行堆叠**。
+详细见：
+[[【Pytorch】torch.stack()的使用]]
+
+# 31、nn.flatten函数
+在卷积神经网络（CNN）中，卷积层和池化层的输出通常是**多维张量**。而线性层（全连接层）仅接收**一维张量**作为输入，因此在将卷积/池化层的输出传入线性层前，必须先进行展平操作。==默认按行进行展平操作==
+
+举个例子：  
+假设某CNN的最后一个池化层输出为一个3维张量，形状为`[batch_size, channels, height, width]`（批量大小、通道数、高度、宽度）；  
+要将其传入线性层，需展平为一维张量，形状变为`[batch_size, channels × height × width]`（批量大小不变，特征维度合并为“通道数×高度×宽度”）。
+详细见：
+
+[[pytorch flatten展开函数]]
+
+类似 torch.flatten函数
+
+```python
+>>> # 定义一个3维张量：形状为[2, 2, 2]（批量大小=2，高度=2，宽度=2）
+>>> t = torch.tensor([[[1, 2],
+...                    [3, 4]],
+...                   [[5, 6],
+...                    [7, 8]]])
+>>> # 不指定start_dim和end_dim：默认展平所有维度，返回1维张量
+>>> torch.flatten(t)
+tensor([1, 2, 3, 4, 5, 6, 7, 8])  # 形状为[8]
+
+>>> # 指定start_dim=1：从第1维（含）开始展平，保留第0维
+>>> torch.flatten(t, start_dim=1)
+tensor([[1, 2, 3, 4],  # 第0维的第一个元素（原[[1,2],[3,4]]）展平为1维
+        [5, 6, 7, 8]]) # 第0维的第二个元素（原[[5,6],[7,8]]）展平为1维
+# 最终形状为[2, 4]（保留第0维的2个元素，后续维度展平为4个元素）
+```
+
+# 33、torch.utils.data.random_split函数
+
+torch.utils.data.random_拆分（dataset, length, generator=<torch.\_c .生成器对象>)[source]
+
+**随机将一个数据集分成给定长度的不重叠的新数据集。** 
+如果给出的分数列表的总和为1，则每个分数的长度将自动计算为floor（frac * len(dataset)）。在计算完长度后，如果有余数，则以循环方式将1个计数分配给长度，直到没有余数为止。可选地修复生成器以获得可重复的结果，例如：
+```python
+# `torch.Generator()` 创建了一个随机数生成器实例，而 `.manual_seed(42)` 则为这个生成器设置了固定的随机种子。
+generator1 = torch.Generator().manual_seed(42)
+generator2 = torch.Generator().manual_seed(42)
+random_split(range(10), [3, 7], generator=generator1)
+random_split(range(30), [0.3, 0.3, 0.4], generator=generator2)
+```
+
+# 34、torch.norm函数
+`torch.norm`函数计算张量的p-范数或Frobenius范数，常用于向量归一化、距离计算等场景。
+
+### 基本语法
+torch.norm(input, p='fro', dim=None, keepdim=False, out=None, dtype=None)
+
+### 参数说明
+
+- `input`: 输入张量
+- `p`: 范数类型，默认为'fro'（Frobenius范数）
+    - `p=2`: L2范数（欧几里得范数），默认值
+    - `p=1`: L1范数
+    - `p=float('inf')`: 无穷范数
+- `dim`: 计算范数的维度
+- `keepdim`: 是否保持维度
+
+### 示例
+
+```python
+import torch
+
+# 创建一个向量
+vec = torch.tensor([3.0, 4.0])
+print(f"原向量: {vec}")
+
+# 计算L2范数
+norm = torch.norm(vec)
+print(f"L2范数: {norm}")  # 输出: 5.0 (sqrt(3² + 4²) = 5)
+
+# 归一化向量
+normalized_vec = vec / norm
+print(f"归一化后: {normalized_vec}")  # 输出: [0.6000, 0.8000]
+print(f"归一化后的范数: {torch.norm(normalized_vec)}")  # 输出: 1.0
+```
+
+
+# 35、torch.repeat()
+- tensor.repeat() 函数用于沿着指定维度重复张量元素
+- **参数个数不能少于被操作张量的维度个数**
+- 重复操作会创建新的张量，不会修改原始张量
+- 参数从后向前对应张量的维度
+
+```python
+>>> import torch
+>>> 
+>>> # 定义一个 33x55 张量
+>>> a = torch.randn(33, 55)
+>>> a.size()
+torch.Size([33, 55])
+>>> 
+>>> # 下面开始尝试 repeat 函数在不同参数情况下的效果
+>>> a.repeat(1,1).size()     # 原始值：torch.Size([33, 55])
+torch.Size([33, 55])
+>>> 
+>>> a.repeat(2,1).size()     # 原始值：torch.Size([33, 55])
+torch.Size([66, 55])
+>>> 
+>>> a.repeat(1,2).size()     # 原始值：torch.Size([33, 55])
+torch.Size([33, 110])
+>>>
+>>> a.repeat(1,1,1).size()   # 原始值：torch.Size([33, 55])
+torch.Size([1, 33, 55])
+>>>
+>>> a.repeat(2,1,1).size()   # 原始值：torch.Size([33, 55])
+torch.Size([2, 33, 55])
+>>>
+>>> a.repeat(1,2,1).size()   # 原始值：torch.Size([33, 55])
+torch.Size([1, 66, 55])
+>>>
+>>> a.repeat(1,1,2).size()   # 原始值：torch.Size([33, 55])
+torch.Size([1, 33, 110])
+>>>
+>>> a.repeat(1,1,1,1).size() # 原始值：torch.Size([33, 55])
+torch.Size([1, 1, 33, 55])
+>>> 
+```
+
+#### 注意
+
+**参数个数不能少于被操作张量的维度个数**
+
+```python
+>>> # 定义一个3维的张量，然后展示前面提到的那个错误
+>>> b = torch.randn(5,6,7)
+>>> b.size() # 3D
+torch.Size([5, 6, 7])
+>>> 
+>>> b.repeat(2).size() # 1D < 3D, error
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+RuntimeError: Number of dimensions of repeat dims can not be smaller than number of dimensions of tensor
+>>>
+>>> b.repeat(2,1).size() # 2D < 3D, error
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+RuntimeError: Number of dimensions of repeat dims can not be smaller than number of dimensions of tensor
+>>>
+>>> b.repeat(2,1,1).size() # 3D = 3D, okay
+torch.Size([10, 6, 7])
+```
+
+# 36、torch.expand()
+还是repeat更有用一点。
+
+先看招
+
+```python
+import torch
+```
+
+```python
+x = torch.tensor([[1], [2], [3]])
+print(x.size())
+print(x.expand(3, 4))
+print(x.expand(-1, 4))   # -1 means not changing the size of that dimension，所以原来是3，现在仍然是3，故和上述等价
+```
+
+![在这里插入图片描述](https://i-blog.csdnimg.cn/blog_migrate/9b4d861ab9d48044d2f71efdc1d1aaa5.png)
+
+说白了，就是复制！！！怎么复制呢？原来是[3,1]，现在要变成[3,4]，所以是对原tensor中第二个维度里面的数进行复制！！
+
+要求：  
+**被扩张的那个维度必须只有一个数！！**也就是说size必须是1！！，所以原tensor必须size是[3,1]，不可以是[3,2]，否则报错。即：
+
+> tensor with singleton dimensions expanded to a larger size.
+
+#### 实际例子
+
+```python
+a = torch.tensor(
+        [
+            [0,1],
+            [0,0],
+            [1,0]
+        ]
+    ).unsqueeze(1).unsqueeze(2)
+
+# [3, 1, 1, 2])
+a.shape
+
+# [3, 8, 1, 2]
+a.expand(3,8,1,2).shape
+```
+
+# 37、torch.tril()
+### 用法介绍
+
+ pytorch中tril函数主要用于返回一个矩阵主对角线以下的下三角矩阵，其它元素全部为000。当输入是一个多维张量时，返回的是同等维度的张量并且最后两个维度的下三角矩阵的。
+
+> torch.tril(input, diagonal=0, *, out=None) ⟶\longrightarrow⟶Tensor
+> 
+> - **input(tensor)**：表示输入的张量
+>     
+> - **diagonal (int, optional)**：表示对角线的位置
+>     
+
+参数$\mathrm{diagonal}$主要控制矩阵主对角线元素的位置。
+给定一个矩阵$A\in \mathbb{R}^{d_1\times d_2}$​，则这个矩阵的主对角线元素组成的集合为$\{(i,i)| i \in [0,\min\{d_1,d_2\}-1]\}$
+当参数$\mathrm{diagonal}=k$，且$k\in\mathbb{Z}^{+}$时，则此时矩阵主对角线元素的集合为$\{(i,i+|k|)| i \in [0,\min\{d_1,d_2\}]-1\}$
+当参数$\mathrm{diagonal}=k$，且$k\in\mathbb{Z}^{-}$时，则此时矩阵主对角线元素的集合为$\{(i+|k|,i)| i \in [0,\min\{d_1,d_2\}]-1\}$
+
+ torch.tril函数具体的程序代码示例如下所示
+```python
+
+ >>> import torch  
+ >>> a = torch.randn(3, 4)  
+ >>> import torch  
+ >>> a = torch.randn(3, 3)  
+ >>> a  
+ tensor([[ 0.4925,  1.0023, -0.5190],  
+         [ 0.0464, -1.3224, -0.0238],  
+         [-0.1801, -0.6056,  1.0795]])  
+ >>> torch.tril(a)  
+ tensor([[ 0.4925,  0.0000,  0.0000],  
+         [ 0.0464, -1.3224,  0.0000],  
+         [-0.1801, -0.6056,  1.0795]])  
+ >>> b = torch.randn(4, 6)  
+ >>> b  
+ tensor([[-0.7886, -0.2559, -0.9161,  0.2353,  0.4033, -0.0633],  
+         [-1.1292, -0.3209, -0.3307,  2.0719,  0.9238, -1.8576],  
+         [-1.1988, -1.0355, -1.2745, -1.7479,  0.3736, -0.7210],  
+         [-0.3380,  1.7570, -1.6608, -0.4785,  0.2950, -1.2821]])  
+ >>> torch.tril(b)  
+ tensor([[-0.7886,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000],  
+         [-1.1292, -0.3209,  0.0000,  0.0000,  0.0000,  0.0000],  
+         [-1.1988, -1.0355, -1.2745,  0.0000,  0.0000,  0.0000],  
+         [-0.3380,  1.7570, -1.6608, -0.4785,  0.0000,  0.0000]])  
+ >>> torch.tril(b, diagonal=1)  
+ tensor([[-0.7886, -0.2559,  0.0000,  0.0000,  0.0000,  0.0000],  
+         [-1.1292, -0.3209, -0.3307,  0.0000,  0.0000,  0.0000],  
+         [-1.1988, -1.0355, -1.2745, -1.7479,  0.0000,  0.0000],  
+         [-0.3380,  1.7570, -1.6608, -0.4785,  0.2950,  0.0000]])  
+ >>> torch.tril(b, diagonal=-1)  
+ tensor([[ 0.0000,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000],  
+         [-1.1292,  0.0000,  0.0000,  0.0000,  0.0000,  0.0000],  
+         [-1.1988, -1.0355,  0.0000,  0.0000,  0.0000,  0.0000],  
+         [-0.3380,  1.7570, -1.6608,  0.0000,  0.0000,  0.0000]])  
+ >>> torch.tril(b, diagonal=2)  
+ tensor([[-0.7886, -0.2559, -0.9161,  0.0000,  0.0000,  0.0000],  
+         [-1.1292, -0.3209, -0.3307,  2.0719,  0.0000,  0.0000],  
+         [-1.1988, -1.0355, -1.2745, -1.7479,  0.3736,  0.0000],  
+         [-0.3380,  1.7570, -1.6608, -0.4785,  0.2950, -1.2821]])
+```
+
+本文转自 [https://blog.csdn.net/qq_38406029/article/details/122059507](https://blog.csdn.net/qq_38406029/article/details/122059507)，如有侵权，请联系删除。
