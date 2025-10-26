@@ -104,6 +104,8 @@ print('predict (after training)',4,forward(4).item())
 
 ##### Exercise 4 使用pytorch实现
 
+**“自动微分”和“动态计算图”**
+
 ```python
 import torch
 

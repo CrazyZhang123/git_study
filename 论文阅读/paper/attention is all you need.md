@@ -97,8 +97,8 @@ Figure 1: The Transformer - model architecture.
 
 **编码器:** 编码器由N ( N = 6 ) 个相同的层组成。每个层包含两个子层。第一个子层是一个多头自注意机制，第二个子层是一个简单的**逐位置**全连接**前馈网络**。我们采用**残差连接**[11]将这两个子层围绕起来，然后进行层归一化[1]。也就是说，每个子层的输出是 LayerNorm(x + Sublayer(x))，其中 Sublayer(x) 是子层本身**实现**的函数。**为了方便这些残差连接，模型中的所有子层以及嵌入层产生的输出都有一个维度为dmodel=512。**
 
-
-
+[[【深度学习】BatchNorm、LayerNorm-CSDN博客]]
+[[【AI基础】图解手算BatchNorm、LayerNorm和GroupNorm-CSDN博客]]
 **LayerNorm(x + Sublayer(x)) 残差连接+样本归一化layernorm**
 
 - identical layers 完全相同的；相同的
