@@ -1,11 +1,4 @@
-<<<<<<< HEAD
-github  mcp token: 
-```
-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
-```
-=======
 
->>>>>>> 4978d2d (2025-10-26 update)
 ```bash
 echo "# LLM_assist" >> README.md
 git init
@@ -27,23 +20,15 @@ git tag version1.0
 ```
 
 - 默认会在 **当前最新 commit** 上创建 tag。
-<<<<<<< HEAD
   
 
-=======
-    
->>>>>>> 4978d2d (2025-10-26 update)
 如果想加描述（**附注 tag / annotated tag**）：
 
 ```bash
 git tag -a version1.0 -m "作业版本 1.0"
 ```
 - `-a` 表示附注 tag。
-<<<<<<< HEAD
   
-=======
-    
->>>>>>> 4978d2d (2025-10-26 update)
 - `-m` 后面是 tag 描述信息。
 ### 3️⃣ 查看已有 tag
 
@@ -67,7 +52,6 @@ git push origin version1.0
 git push origin --tags
 ```
 
-<<<<<<< HEAD
 ✅ 完成后，你的 GitHub 仓库就会显示 tag `version1.0`，对应你最后一次提交。
 
 ## git_filter_repo
@@ -201,6 +185,3 @@ git push origin main --force
 - 你就能成功 push；
 - GitHub 的 secret 扫描不会再拦截；
 - 大文件和敏感信息也都安全清理完毕。
-=======
-✅ 完成后，你的 GitHub 仓库就会显示 tag `version1.0`，对应你最后一次提交。
->>>>>>> 4978d2d (2025-10-26 update)
