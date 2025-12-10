@@ -46,7 +46,7 @@ updated: 2025-01-31T17:08
  window = sample_window(corpus) 
  theta_grad = evaluate_gradient(J,window,theta) 
  theta = theta - alpha * theta_grad 
- ```
+```
 1. **问题阐述**：在自然语言处理等任务中，成本函数 $J(\theta)$ 通常依赖于语料库中的所有窗口（这里的窗口可以理解为文本中的一个片段）。由于语料库往往非常庞大，窗口数量可能达到数十亿个，这使得计算成本函数 $J(\theta)$ 关于参数 $\theta$ 的梯度 $\nabla_{\theta}J(\theta)$ 变得极其耗时和耗费计算资源。如果按照常规方式计算梯度来更新参数，每次更新前的等待时间会非常长，这种方式对于大多数神经网络来说是不可行的。
 2. **解决方案**：随机梯度下降（SGD）是一种解决上述问题的优化算法。**它不再一次性考虑语料库中的所有窗口来计算梯度，而是通过反复从语料库中采样单个窗口或小批次窗口，然后基于这些采样得到的窗口来计算梯度并更新参数 $\theta$。** 这样每次更新的计算量大大减少，能够在更短的时间内完成多次参数更新，提高了训练效率。 
 3. **最常使用的梯度下降算法**
@@ -70,6 +70,7 @@ updated: 2025-01-31T17:08
 ### (3) 负采样 Negative sampling
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130165203.png)
 这段内容围绕词向量模型展开，主要介绍了使用两个向量的原因、模型变体及训练优化方法，具体如下：
+
 1. **使用两个向量的原因**：<mark style="background: #D2B3FFA6;">使用两个向量是为了便于优化，最后可对其取平均值。不过算法也能为每个词仅用一个向量来实现。 </mark>
 2. **模型变体(variants)** 
 	- **Skip - grams（SG）**：<mark style="background: FFFF00;">给定中心词，预测上下文（“外部”）词，且预测与词的位置无关。 (推荐)</mark>
@@ -79,6 +80,38 @@ updated: 2025-01-31T17:08
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130165826.png)
 - **Main idea**: 针对一个**真实词对**（中心词及其上下文窗口中的一个词）与**几个噪声词对**（中心词与一个随机词配对）训练二元逻辑回归。(**train binary logistic regressions** for a true pair (center word and a word in its context window) versus several noise pairs (the center word paired with a random word) )
 
+> 在词向量（如Word2Vec）的训练中，**负采样（Negative Sampling）** 是一种优化训练效率、提升模型性能的技术，核心是**通过“抽样负例”的方式简化目标函数**。以下是其原理和作用的详细说明：
+>
+>
+> ### 1. 负采样的背景：从“全概率”到“抽样概率”
+> 在Word2Vec的**Skip-gram模型**中，原始目标是最大化“给定中心词，预测其上下文词”的概率。假设词汇表大小为\( V \)，则对于每个中心词，模型需要计算它与**所有\( V-1 \)个非中心词**的概率，这在\( V \)很大（如百万级）时，计算量会极其庞大。
+>
+> 为了简化计算，**负采样**的思路是：
+> - 对每个正例（真实的上下文词），只抽样少量**负例（非上下文的“噪声词”）**，用“正例概率 + 负例概率”的组合来近似原目标函数。
+>
+>
+> ### 2. 负采样的具体操作
+> - **正例**：真实的上下文词（即窗口内与中心词共现的词）。
+> - **负例**：从词汇表中**随机抽样的\( k \)个无关词**（\( k \)通常取5~20，可根据任务调整）。
+>
+> 训练时，模型的目标变为：
+> - 最大化正例的预测概率；
+> - 最小化负例的预测概率。
+>
+>
+> ### 3. 负采样的优势
+> - **效率提升**：无需计算所有词汇的概率，只需计算正例+少量负例，训练速度可提升一个数量级。
+> - **性能优化**：通过抽样高频词（通常按词频的0.75次方抽样，避免低频词被忽略），模型能更好地学习语义关系。
+>
+>
+> ### 4. 举例理解
+> 假设中心词是“king”，真实上下文是“queen”（正例）。负采样会随机选几个无关词，比如“apple”“book”“tree”（负例）。模型需要学会：
+> - 让“king”和“queen”的词向量更相似；
+> - 让“king”和“apple”“book”“tree”的词向量更疏远。
+>
+>
+> 简言之，负采样是Word2Vec等模型中**用“抽样负例”替代“全量计算”**的技巧，既降低了计算成本，又能有效学习词的语义表示。
+
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130200517.png)
 
 - 来自论文：“Distributed Representations of Words and Phrases and their Compositionality” (Mikolov et al. 2013) 
@@ -86,7 +119,7 @@ updated: 2025-01-31T17:08
 - 逻辑/ sigmoid函数：$\sigma(x)=\frac{1}{1 + e^{-x}}$（我们很快就会成为好朋友） 
 - <mark style="background: #D2B3FFA6;"> 我们最大化第一个对数项中两个词共现的概率，并最小化噪声词的概率</mark>(We maximize the probability of two words co-occurring in first log and minimize probability of noise words )
 
- 1. **目标函数** - 总体目标函数 $J(\theta)$ 是对T 个时间步的 $J_{t}(\theta)$ 取平均。其中 $J_{t}(\theta)$ 由两部分组成，第一部分 $\log\sigma(u_{o}^{T}v_{c})$ 用于衡量真实词对（中心词 $c$ 与上下文词 $o$ ）的共现概率，通过sigmoid函数 $\sigma(x)$ 进行变换后取对数；第二部分 $\sum_{i = 1}^{k}\mathbb{E}_{j\sim P(w)}[\log\sigma(-u_{j}^{T}v_{c})]$ 是对 k 个噪声词的期望，**目的是最小化噪声词（即与中心词不相关的随机词 j ）与中心词共现的概率。**
+ 1. **目标函数** - 总体目标函数 $J(\theta)$ 是对T 个时间步的 $J_{t}(\theta)$ 取平均。其中 $J_{t}(\theta)$ 由两部分组成，第一部分 $\log\sigma(u_{o}^{T}v_{c})$ 用于**衡量真实词对（中心词 $c$ 与上下文词 $o$ ）的共现概率**，通过sigmoid函数 $\sigma(x)$ 进行变换后取对数；第二部分 $\sum_{i = 1}^{k}\mathbb{E}_{j\sim P(w)}[\log\sigma(-u_{j}^{T}v_{c})]$ 是对 k 个噪声词的期望，**目的是最小化噪声词（即与中心词不相关的随机词 j ）与中心词共现的概率。**
 	- $\mathbb{E}_{j\sim P(w)}$ **表示基于分布 $P(w)$ 对变量 $j$ 求期望**。 在词向量相关的负采样场景中，$P(w)$ 通常是一个词在语料库中出现的概率分布 。$j$ 是从这个分布中采样得到的噪声词（即与中心词在语义上不相关的随机词）。通过对 $j$ 求期望，是为了综合考虑多个从分布 $P(w)$ 中采样得到的噪声词的情况，在目标函数中最小化这些噪声词与中心词共现的概率，从而让模型更聚焦于学习真实词对（中心词和其上下文词）之间的关系，提升词向量学习的效果。**简单来说，它是在负采样过程中，衡量噪声词影响的一种数学方式，把从特定分布采样的多个噪声词纳入到计算中，以优化词向量的训练。**
  1. **sigmoid函数**：$\sigma(x)=\frac{1}{1 + e^{-x}}$ 是逻辑/ sigmoid函数，其输出值在0到1之间，常用于将输入映射为概率值，在上述目标函数中起到**将词向量的内积结果转换为概率度量**的作用。 4. **优化目的**：通过最大化目标函数 $J(\theta)$，**实现最大化真实词对的共现概率，同时最小化噪声词与中心词共现的概率，从而学习到更好的词向量表示，使得在向量空间中语义相近的词距离更近 。**
 
@@ -123,10 +156,11 @@ Building a co - occurrence matrix $X$
     - I like deep learning
     - I like NLP
     - I enjoy flying  
-![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130212340.png)
+    ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130212340.png)
 
 示例
 从句子 “I like deep learning” 中提取出的词汇表为 `["I", "like", "deep", "learning"]`。
+
 - 对于词 “I”：
     - 其窗口内右侧词为 “like”，所以 “I” 和 “like” 的共现次数为 1。“I” 与词汇表中其他词（“deep”、“learning”）在窗口 `window = 1` 的情况下没有共现，共现次数为 0。
 - 对于词 “like”：
@@ -148,6 +182,14 @@ Building a co - occurrence matrix $X$
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130213602.png)
 - Singular Value Decomposition of co - occurrence matrix $X$ (对共现矩阵 $X$ 进行奇异值分解)
 - Factorizes $X$ into $U\Sigma V^{T}$, where $U$ and $V$ are orthonormal(将 $X$ 分解为 $U\Sigma V^{T}$，其中 $U$ 和 $V$ 是正交矩阵) 
+
+  - > 在[矩阵论](https://zh.wikipedia.org/wiki/矩阵论)中，**正交矩阵**（英语：orthogonal matrix），又称**直交矩阵**，是一个[方块矩阵](https://zh.wikipedia.org/wiki/方块矩阵)Q![{\displaystyle Q}](https://wikimedia.org/api/rest_v1/media/math/render/svg/8752c7023b4b3286800fe3238271bbca681219ed)，其元素为[实数](https://zh.wikipedia.org/wiki/实数)，而且行向量与列向量皆为[正交](https://zh.wikipedia.org/wiki/正交)的[单位向量](https://zh.wikipedia.org/wiki/单位向量)，使得该矩阵的[转置矩阵](https://zh.wikipedia.org/wiki/转置矩阵)为其[逆矩阵](https://zh.wikipedia.org/wiki/逆矩阵)：
+    >
+    > $Q^T=Q^{-1}$ $Q^TQ=QQ^T=\mathrm{I}$
+    >
+    > 其中，$I$为[单位矩阵](https://zh.wikipedia.org/wiki/單位矩陣)。正交矩阵的[行列式](https://zh.wikipedia.org/wiki/行列式)值必定为1或-1
+    >
+    > ![image-20251030143149267](https://gitee.com/zhang-junjie123/picture/raw/master/image/image-20251030143149267.png)
 - Retain only $k$ singular values, in order to generalize. $\hat{X}$ is the best rank - $k$ approximation to $X$, in terms of least squares. Classic linear algebra result. Expensive to compute for large matrices. (为了实现泛化，仅保留 $k$ 个奇异值。就最小二乘法而言，$\hat{X}$ 是 $X$ 的最佳 $k$ 秩近似。这是经典的线性代数结果。对于大型矩阵，计算成本很高。 )
  1. **奇异值分解原理**：将共现矩阵 $X$ 分解为三个矩阵的乘积 $U\Sigma V^{T}$。其中 $U$ 和 $V$ 是正交矩阵，具有很好的数学性质；$\Sigma$ 是对角矩阵，对角线上的元素就是奇异值，它们反映了矩阵 $X$ 的重要特征。 
  2. **降维操作与效果**：为了达到降维目的并实现一定的泛化能力，**只保留 $k$ 个最大的奇异值，其余的奇异值设为0，这样得到的矩阵 $\hat{X}$ 就是原矩阵 $X$ 的一个最佳 $k$ 秩近似（从最小二乘法的角度来看，它与原矩阵 $X$ 的误差最小）**。通过这种方式，可以将高维的共现矩阵转换为低维表示。然而，对于大型的共现矩阵，奇异值分解的计算量非常大，需要耗费较多的计算资源和时间。 这也是在应用该方法时需要考虑的问题。
@@ -170,63 +212,74 @@ Building a co - occurrence matrix $X$
 ## 5. 迈向 GloVe：基于计数的方法与直接预测的方法 Towards GloVe: Count based vs. direct prediction
 ![image.png|671](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130215925.png)
 
-|                                                基于计数的方法                                                |                                                                 直接预测的方法                                                                 |
-| :---------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------: |
+|                  基于计数count_based的方法                   |               直接预测direct prediction的方法                |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
 | 潜在语义分析（LSA）、超平面词表示（HAL，Lund & Burgess提出）、COALS、赫林格主成分分析（Hellinger - PCA，Rohde等人，Lebret & Collobert提出） | 跳字模型/连续词袋模型（Skip - gram/CBOW，Mikolov等人提出）、神经网络语言模型（NNLM）、分层对数线性模型（HLBL）、循环神经网络（RNN，Bengio等人；Collobert & Weston；Huang等人；Mnih & Hinton提出） |
-|                                                 训练速度快                                                 |                                                                随语料库规模扩展                                                                 |
-|                                               统计信息使用高效                                                |                                                                统计信息使用低效                                                                 |
-|                                              主要用于捕捉词的相似性                                              |                                                              在其他任务上产生更好的性能                                                              |
-|                                            对大量计数给予不成比例的重要性                                            |                                                             可以捕捉词相似性之外的复杂模式                                                             |
- 解释 
+|                          训练速度快                          |                       随语料库规模扩展                       |
+|                       统计信息使用高效                       |                       统计信息使用低效                       |
+|                    主要用于捕捉词的相似性                    |                  在其他任务上产生更好的性能                  |
+|                对大量计数给予不成比例的重要性                |                可以捕捉词相似性之外的复杂模式                |
+|                             解释                             |                                                              |
  1. **基于计数的方法特点** - **训练速度**：训练过程通常较快。 - **统计信息利用**：能高效地利用语料库中的统计信息，比如通过构建共现矩阵等方式。 - **应用重点**：主要聚焦于捕捉词与词之间的相似性。 - **局限性**：对共现计数中出现频率高的情况给予了过高的重要性，可能导致对低频词信息的忽视。 
  2. **直接预测的方法特点** - **规模适应性**：模型性能通常会随着语料库规模的增大而提升。 - **统计信息利用**：相对而言，在统计信息的利用效率上较低。 - **任务表现**：不仅能学习词向量，还能在诸如文本分类、情感分析等其他自然语言处理任务上取得较好的性能。 - **模式捕捉能力**：能够捕捉到词相似性之外的更复杂的语义和语法模式。这些对比有助于理解不同词向量学习方法的优势与不足，为选择合适的方法或进一步改进模型提供参考。
 
 ### (1)在向量差异中编码意义Encoding meaning in vector differences 
 \[Pennington, Socher, and Manning, EMNLP 2014\]
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130221048.png)
-关键见解：共现概率的比率可以编码意义成分(Crucial insight: Ratios of co - occurrence probabilities can encode meaning components)
+关键见解：**共现概率的比率可以编码意义成分**(Crucial insight: Ratios of co - occurrence probabilities can encode meaning components)
 
  1. **研究来源与核心观点**：该内容来自2014年EMNLP会议上Pennington、Socher和Manning的研究。其核心观点是共现概率的比率能够对意义成分进行编码。这意味着可以通过分析不同词与其他词的共现概率之比，来挖掘词的语义信息。 
  2. **概率数据示例**：表格中给出了不同的 $x$ 值（固体、气体、水、时尚）分别在给定词“ice（冰）”和“steam（蒸汽）”条件下的共现概率 $P(x|ice)$ 和 $P(x|steam)$ 。例如，“固体”在“冰”的语境下的共现概率 $P(x = solid|ice)$ 为 $1.9\times10^{-4}$ ，在“蒸汽”的语境下的共现概率 $P(x = solid|steam)$ 为 $2.2\times10^{-5}$ 。 
- 3. **概率比率分析**：通过计算 $P(x|ice)$ 与 $P(x|steam)$ 的比率，可以发现一些语义相关的信息。比如对于“固体”和“气体”，它们与“冰”和“蒸汽”的共现概率比率差异较大（8.9和 $8.5\times10^{-2}$ ），这反映了“冰”和“蒸汽”在与“固体”“气体”的语义关联上有明显不同；而“水”的比率为1.36，说明“水”与“冰”“蒸汽”都有一定关联；“时尚”的比率接近1（0.96），**表明“时尚”与“冰”“蒸汽”在这种共现关系上没有明显的偏向性。这种通过共现概率比率来编码意义的方式，为词向量表示语义提供了一种新的思路。**
+ 3. **概率比率分析**：通过计算 $P(x|ice)$ 与 $P(x|steam)$ 的比率，可以发现一些语义相关的信息。比如对于“固体”和“气体”，它们与“冰”和“蒸汽”的共现概率比率差异较大（8.9和 $8.5\times10^{-2}$ ），这反映了“冰”和“蒸汽”在与“固体”“气体”的语义关联上有明显不同；而**“水”的比率为1.36，说明“水”与“冰”“蒸汽”都有一定关联**；“时尚”的比率接近1（0.96），**表明“时尚”与“冰”“蒸汽”在这种共现关系上没有明显的偏向性。这种通过共现概率比率来编码意义的方式，为词向量表示语义提供了一种新的思路。**
 
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130223926.png)
- 问：我们如何在词向量空间中捕捉共现概率的比率作为线性意义成分？ 答：对数双线性模型：$w_{i}\cdot w_{j}=\log P(i|j)$ 利用向量差：$w_{x}\cdot(w_{a}-w_{b})=\log\frac{P(x|a)}{P(x|b)}$ 
+ 问：我们如何在词向量空间中捕捉**共现概率的比率作为线性意义成分**？ 
+
+答：对数双线性模型：$w_{i}\cdot w_{j}=\log P(i|j)$ 
+
+利用向量差：$w_{x}\cdot(w_{a}-w_{b})=\log\frac{P(x|a)}{P(x|b)}$ 
+
   1. **问题核心**：探讨在词向量空间里将共现概率的比率表示为线性意义成分的方法。这是在词向量研究中关于如何更好地编码语义信息的问题。
   2. **对数双线性模型解答** 
 	  - $w_{i}\cdot w_{j}=\log P(i|j)$：通过词向量的点积来表示在词$j$出现的条件下词$i$出现的概率的对数。这种方式将词的共现概率信息融入到词向量的运算中，利用点积的线性运算性质来捕捉语义关联。 
-	  - $w_{x}\cdot(w_{a}-w_{b})=\log\frac{P(x|a)}{P(x|b)}$：利用向量差进一步拓展，该式表示词$x$的向量与词$a$和词$b$的向量差做点积，结果等于在词$a$和词$b$出现的条件下词$x$出现的概率之比的对数。通过这种向量差的点积运算，可以捕捉到不同词之间基于共现概率比率的语义关系，例如在类比任务中可以体现词之间的语义相似性和差异性等关系，从线性运算的角度对语义信息进行编码和表示。
+	- $w_{x}\cdot(w_{a}-w_{b})=\log\frac{P(x|a)}{P(x|b)}$：利用向量差进一步拓展，该式表示词$x$的向量与词$a$和词$b$的向量差做点积，结果等于在词$a$和词$b$出现的条件下词$x$出现的概率之比的对数。通过这种向量差的点积运算，可以捕捉到不同词之间基于共现概率比率的语义关系，例如在类比任务中可以体现词之间的语义相似性和差异性等关系，从线性运算的角度对语义信息进行编码和表示。
 ### (2)Combining the best of both worlds 
 GloVe [Pennington, Socher, and Manning, EMNLP 2014]
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130223850.png)
-$$w_{i}\cdot w_{j}=\log P(i|j)$$$$J = \sum_{i,j = 1}^{V}f(X_{ij})(w_{i}^{T}\tilde{w}_{j}+b_{i}+\tilde{b}_{j}-\log X_{ij})^{2}$$
+$$w_{i}\cdot w_{j}=\log P(i|j)$$
+
+$$J = \sum_{i,j = 1}^{V}f(X_{ij})(w_{i}^{T}\tilde{w}_{j}+b_{i}+\tilde{b}_{j}-\log X_{ij})^{2}$$
+
 - 训练速度快 
 - 可扩展到大型语料库 
 - 即使在小语料库和小向量情况下也有良好性能 
 1. **模型简介**：GloVe（Global Vectors for Word Representation）是由Pennington、Socher和Manning在2014年EMNLP会议上提出的词向量模型，旨在融合基于计数和直接预测两类方法的优点。 
 2. **核心公式** 
-	- $w_{i}\cdot w_{j}=\log P(i|j)$ ：表示两个词向量 $w_{i}$ 和 $w_{j}$ 的点积等于在词 $j$ 出现的条件下词 $i$ 出现的概率的对数。通过这种方式将词的共现概率信息融入到词向量的表示中。 
-	- $J = \sum_{i,j = 1}^{V}f(X_{ij})(w_{i}^{T}\tilde{w}_{j}+b_{i}+\tilde{b}_{j}-\log X_{ij})^{2}$ ：这是GloVe模型的目标函数。其中 $V$ 是词汇表大小，$X_{ij}$ 是词 $i$ 和词 $j$ 的共现次数，<mark style="background: #D2B3FFA6;">$f(X_{ij})$ 是一个权重函数，用于调整不同共现次数的贡献程度</mark>；$w_{i}$ 和 $\tilde{w}_{j}$ 是词 $i$ 和词 $j$ 的不同向量表示，$b_{i}$ 和 $\tilde{b}_{j}$ 是偏置项。**该目标函数通过最小化预测的共现对数与实际共现对数之间的差异来训练词向量。** 
-3. **模型特点** - **训练速度**：具有较快的训练速度，相比一些其他模型能够在更短时间内完成训练。 - **语料库适应性**：可以很好地扩展到大型语料库上，随着语料库规模的增大，依然能有效学习词向量。 - **性能稳定性**：即使在语料库规模较小和词向量维度较小的情况下，也能表现出良好的性能，具有较强的鲁棒性。
+  - $w_{i}\cdot w_{j}=\log P(i|j)$ ：表示两个词向量 $w_{i}$ 和 $w_{j}$ 的点积等于在词 $j$ 出现的条件下词 $i$ 出现的概率的对数。==通过这种方式将词的共现概率信息融入到词向量的表示中。== 
+  - $J = \sum_{i,j = 1}^{V}f(X_{ij})(w_{i}^{T}\tilde{w}_{j}+b_{i}+\tilde{b}_{j}-\log X_{ij})^{2}$ ：这是GloVe模型的目标函数。其中 $V$ 是词汇表大小，$X_{ij}$ 是词 $i$ 和词 $j$ 的共现次数，<mark style="background: #D2B3FFA6;">$f(X_{ij})$ 是一个权重函数，用于调整不同共现次数的贡献程度</mark>；$w_{i}$ 和 $\tilde{w}_{j}$ 是词 $i$ 和词 $j$ 的不同向量表示，$b_{i}$ 和 $\tilde{b}_{j}$ 是偏置项。**该目标函数通过最小化预测的共现对数与实际共现对数之间的差异来训练词向量。** 
+3. **模型特点**
+   - **训练速度**：具有较快的训练速度，相比一些其他模型能够在更短时间内完成训练。 
+   - **语料库适应性**：可以很好地扩展到大型语料库上，随着语料库规模的增大，依然能有效学习词向量。 
+   - **性能稳定性**：即使在语料库规模较小和词向量维度较小的情况下，也能表现出良好的性能，具有较强的鲁棒性。
 
 ### (3)GloVe results 模型结果
 ![image.png](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130224318.png)
 ## 6. 怎样评估词向量 How to evaluate word vectors?
 ![image.png|676](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130224856.png)
-- 与自然语言处理中的一般评估相关：内在评估与外在评估(Intrinsic vs. extrinsic)
-- 内在评估(Intrinsic)：
+- **与自然语言处理中的一般评估相关：内在评估与外在评估(Intrinsic vs. extrinsic)**
+- **内在评估**(Intrinsic)：
     - 在特定 / 中间子任务上进行评估
     - 计算速度快
     - 有助于理解系统
     - **除非与实际任务建立关联，否则其实际帮助作用不明确**
-- 外在评估(extrinsic)：
+- **外在评估**(extrinsic)：
     - 在实际任务上进行评估
     - 计算准确率可能需要**很长时间**
     - 不清楚是子系统本身的问题，还是其交互作用或其他子系统的问题
     - 如果用另一个子系统精确替换一个子系统能提高准确率→成功！
 ### (1)词向量的内在评估 Intrinsic word vector evaluation
 ![image.png|731](https://gitee.com/zhang-junjie123/picture/raw/master/image/20250130225250.png)
-- 词向量类比(Word Vector Analogies)
+- **词向量类比(Word Vector Analogies)**
 	- man : woman 
 	- king : ?
 - 通过相加后的余弦距离在捕捉直观语义和句法类比问题上的表现来评估词向量 Evaluate word vectors by how well their cosine distance after addition captures intuitive semantic and syntactic analogy questions
@@ -314,7 +367,7 @@ pike
 
  - 在像word2vec这样的标准词嵌入中，一个词的不同词义存在于线性叠加（加权和）中 
 	 - $v_{pike}=\alpha_{1}v_{pike_{1}}+\alpha_{2}v_{pike_{2}}+\alpha_{3}v_{pike_{3}}$ - 其中 $\alpha_{1}=\frac{f_{1}}{f_{1}+f_{2}+f_{3}}$ 等，$f$ 为频率 
- - 惊人的结果： 
+ - **惊人的结果**： 
  - 由于稀疏编码的思想，实际上可以分离出这些词义（前提是它们相对常见）！ 
  1. **研究主题**：来自Arora等人2018年发表于TACL的研究，聚焦于词义的线性代数结构以及其在多义词处理上的应用。 
  2. **词义表示原理**：在word2vec等标准词嵌入模型中，**一个多义词（如“pike”）的不同词义向量通过线性叠加（加权和）的形式存在**。公式$v_{pike}=\alpha_{1}v_{pike_{1}}+\alpha_{2}v_{pike_{2}}+\alpha_{3}v_{pike_{3}}$ 表示“pike”的词向量由其不同词义对应的词向量加权求和得到，权重 $\alpha_{i}$ 由对应词义出现的频率 $f_{i}$ 决定。 

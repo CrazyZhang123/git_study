@@ -2,3 +2,5 @@ python学习/数据分析/code/
 *.env
 *_token.txt
 token.json
+.DS_Store
+course/cs224n/CS224N-2021winter-tutorial/
