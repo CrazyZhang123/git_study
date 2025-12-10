@@ -5,9 +5,9 @@ python steering_928.py \
 	 --layer 14 \
 	 --save_path checkpoints/llama3.1_8B_L14_mat_steer_928.pt \
 	 --batch_size 96 \
-	 --epochs 100 \
+	 --epochs 10 \
 	 --lr 0.001 \
-	 --sigma 2.0 \
+	 --sigma 1.0 \
 	 --lambda_mmd 1.0 \
 	 --lambda_sparse 0.9 \
 	 --lambda_ortho 0.1 \

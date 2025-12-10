@@ -1,4 +1,7 @@
-
+github  mcp token: 
+```
+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
+```
 ```bash
 echo "# LLM_assist" >> README.md
 git init

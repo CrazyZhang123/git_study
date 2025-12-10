@@ -30,8 +30,8 @@ mkdir -p validation/answer_dump/summary_dump/val  # 创建验证答案汇总存�
 进入`get_activations`目录，提取指定层的最后一个token的激活值：
 ```bash
 CUDA_VISIBLE_DEVICES=0 python get_activations.py --model_name llama3.1_8B --dataset_name truthfulqa --layer 14
-CUDA_VISIBLE_DEVICES=0 python get_activations.py --model_name llama3.1_8B --dataset_name toxigen --layer 14
-CUDA_VISIBLE_DEVICES=0 python get_activations.py --model_name llama3.1_8B --dataset_name bbq --layer 14
+CUDA_VISIBLE_DEVICES=1 python get_activations.py --model_name llama3.1_8B --dataset_name toxigen --layer 14
+CUDA_VISIBLE_DEVICES=2 python get_activations.py --model_name llama3.1_8B --dataset_name bbq --layer 14
 ```
 （注：`CUDA_VISIBLE_DEVICES=0`指定使用第1块GPU；`--dataset_name`后可替换为目标数据集，如truthfulqa、toxigen、bbq；`--layer 14`指定提取第14层的激活值）
 
@@ -53,7 +53,7 @@ python steering.py \
  --lambda_pos 0.9  # 位置约束损失权重
 ```
 
-
+CUDA_VISIBLE_DEVICES=0
 ### **3. 评估MAT-Steer模型**
 在TruthfulQA数据集上评估训练好的模型：
 ```bash
