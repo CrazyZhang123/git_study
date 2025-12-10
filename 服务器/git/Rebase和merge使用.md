@@ -52,7 +52,7 @@ git checkout redmiBook
 git checkout main
 ```
 
-##### 5、#把main rebase 到 redmiBook 分支上（由于 redmiBook 继承自 main，所以 git 只是简单的把 main 分支的引用向前移动了一下而已。）
+##### 5、把main rebase 到 redmiBook 分支上（由于 redmiBook 继承自 main，所以 git 只是简单的把 main 分支的引用向前移动了一下而已。）
 
 > 没有5的话，main还是原始的位置，没有redmiBook的提交，只是本地分支，将redmiBook分支 变基 到 main 上，也顺便同步了远程仓库，见下方。
 
@@ -139,7 +139,7 @@ Auto-merging TRM.ipynb
 Automatic merge failed; fix conflicts and then commit the result.
 ```
 
-
+可以通过vscode进行合并分支，可以清楚的对比diff。
 
 ## 推送到远程仓库
 
