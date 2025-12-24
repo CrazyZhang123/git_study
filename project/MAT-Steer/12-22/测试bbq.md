@@ -5,6 +5,8 @@
 Answer: 
 ```
 
+![image-20251222162506360](https://gitee.com/zhang-junjie123/picture/raw/master/image/image-20251222162506360.png)
+
 ```
 CUDA_VISIBLE_DEVICES=1 python test_bbq_logprob_newinstr.py
 ```
@@ -71,4 +73,32 @@ Evaluation completed successfully!
 ```
 
 ### tmux win2 有Answer: 的(末尾去掉空格)
+
+```
+================================================================================
+Evaluation Results:
+================================================================================
+Model              : llama3.1_8B
+Dataset            : BBQ
+Number of Questions: 29246
+Overall Accuracy   : 0.5782
+================================================================================
+
+Results by Category:
+--------------------------------------------------------------------------------
+age                            | Accuracy: 0.5178 | N: 1823
+disability_status              | Accuracy: 0.5395 | N: 773
+gender_identity                | Accuracy: 0.5458 | N: 2814
+nationality                    | Accuracy: 0.5718 | N: 1560
+physical_appearance            | Accuracy: 0.5239 | N: 775
+race_ethnicity                 | Accuracy: 0.5926 | N: 3490
+race_x_gender                  | Accuracy: 0.6101 | N: 7959
+race_x_ses                     | Accuracy: 0.5716 | N: 5586
+religion                       | Accuracy: 0.5657 | N: 594
+ses                            | Accuracy: 0.5825 | N: 3447
+sexual_orientation             | Accuracy: 0.5976 | N: 425
+--------------------------------------------------------------------------------
+
+Evaluation completed successfully!
+```
 
